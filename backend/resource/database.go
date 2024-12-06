@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"rudder/backend/config"
+	"rudder/backend/models"
 
 	pgxdecimal "github.com/jackc/pgx-shopspring-decimal"
 	"github.com/jackc/pgx/v5"
@@ -17,7 +18,7 @@ type Database struct {
 	Pool   *pgxpool.Pool
 }
 
-func upsertOrganizations(conn *pgxpool.Conn, orgs []OrganizationRow) (int64, error) {
+func upsertOrganizations(conn *pgxpool.Conn, orgs []models.OrganizationRow) (int64, error) {
 	batch := &pgx.Batch{}
 	for _, row := range orgs {
 		batch.Queue(`
@@ -43,7 +44,7 @@ func upsertOrganizations(conn *pgxpool.Conn, orgs []OrganizationRow) (int64, err
 	return totalInserted, nil
 }
 
-func upsertAccounts(conn *pgxpool.Conn, accs []AccountRow) (int64, error) {
+func upsertAccounts(conn *pgxpool.Conn, accs []models.AccountRow) (int64, error) {
 	batch := &pgx.Batch{}
 	for _, row := range accs {
 		batch.Queue(`
@@ -69,7 +70,7 @@ func upsertAccounts(conn *pgxpool.Conn, accs []AccountRow) (int64, error) {
 	return totalInserted, nil
 }
 
-func upsertBalances(conn *pgxpool.Conn, bals []BalanceRow) (int64, error) {
+func upsertBalances(conn *pgxpool.Conn, bals []models.BalanceRow) (int64, error) {
 	batch := &pgx.Batch{}
 	for _, row := range bals {
 		batch.Queue(`
@@ -95,7 +96,7 @@ func upsertBalances(conn *pgxpool.Conn, bals []BalanceRow) (int64, error) {
 	return totalInserted, nil
 }
 
-func upsertTransactions(conn *pgxpool.Conn, txns []TransactionRow) (int64, error) {
+func upsertTransactions(conn *pgxpool.Conn, txns []models.TransactionRow) (int64, error) {
 	batch := &pgx.Batch{}
 	for _, row := range txns {
 		batch.Queue(`
@@ -129,7 +130,7 @@ func upsertTransactions(conn *pgxpool.Conn, txns []TransactionRow) (int64, error
 	return totalInserted, nil
 }
 
-func (db Database) UpsertAll(model RowModel) error {
+func (db Database) UpsertAll(model models.RowModel) error {
 	conn, err := db.Pool.Acquire(context.Background())
 	if err != nil {
 		return err
@@ -175,8 +176,8 @@ func (db Database) UpsertAll(model RowModel) error {
 	return nil
 }
 
-func (db Database) GetAutocatRules() ([]AutoCatRule, error) {
-	var rules []AutoCatRule
+func (db Database) GetAutocatRules() ([]models.AutoCatRule, error) {
+	var rules []models.AutoCatRule
 
 	conn, err := db.Pool.Acquire(context.Background())
 	if err != nil {
@@ -219,7 +220,7 @@ func (db Database) GetAutocatRules() ([]AutoCatRule, error) {
 	for rows.Next() {
 		var rawCriteria string
 		var rawOverrides string
-		var rule AutoCatRule
+		var rule models.AutoCatRule
 
 		if err := rows.Scan(&rawCriteria, &rawOverrides); err != nil {
 			return nil, err
@@ -236,6 +237,52 @@ func (db Database) GetAutocatRules() ([]AutoCatRule, error) {
 	}
 
 	return rules, nil
+}
+
+func (db Database) GetTransactionRows() ([]models.TransactionRow, error) {
+	var txns []models.TransactionRow
+
+	conn, err := db.Pool.Acquire(context.Background())
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Release()
+
+	rows, err := conn.Query(context.Background(), `
+		select
+			transaction_id, posted_date, description, category,
+			amount, account_id, inst_name, full_description,
+			added_date, categorized_date, note, check_num
+		from transactions`)
+	if err != nil {
+		return nil, err
+	}
+
+	for rows.Next() {
+		var txn models.TransactionRow
+
+		err := rows.Scan(
+			&txn.TransactionID,
+			&txn.PostedDate,
+			&txn.Description,
+			&txn.Category,
+			&txn.Amount,
+			&txn.AccountID,
+			&txn.InstName,
+			&txn.FullDescription,
+			&txn.AddedDate,
+			&txn.CategorizedDate,
+			&txn.Note,
+			&txn.CheckNum,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		txns = append(txns, txn)
+	}
+
+	return txns, nil
 }
 
 func (db Database) Close() {
