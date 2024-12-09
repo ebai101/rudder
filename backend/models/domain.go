@@ -19,7 +19,7 @@ type Organization struct {
 type Transaction struct {
 	TransactionId string          `json:"id"`
 	PostedDate    int64           `json:"posted"`
-	Amount        decimal.Decimal `json:"amount,string"`
+	Amount        decimal.Decimal `json:"amount"`
 	Description   string          `json:"description"`
 	Payee         string          `json:"payee"`
 	TransactedAt  int64           `json:"transacted_at"`
@@ -30,8 +30,8 @@ type Account struct {
 	AccountId    string          `json:"id"`
 	AccountName  string          `json:"name"`
 	Currency     string          `json:"currency"`
-	Balance      decimal.Decimal `json:"balance,string"`
-	BalanceAvail decimal.Decimal `json:"available-balance,string"`
+	Balance      decimal.Decimal `json:"balance"`
+	BalanceAvail decimal.Decimal `json:"available-balance"`
 	BalanceDate  int64           `json:"balance-date"`
 	Transactions []Transaction   `json:"transactions"`
 }
