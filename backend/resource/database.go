@@ -20,25 +20,28 @@ type Database struct {
 
 func insertOrganizations(conn *pgxpool.Conn, orgs []models.OrganizationRow) (int64, error) {
 	batch := &pgx.Batch{}
+	var totalInserted int64
+
 	for _, row := range orgs {
-		batch.Queue(`
+		q := batch.Queue(`
 			insert into organizations (inst_name, sfin_url, domain_name, url)
 			values ($1, $2, $3, $4)
 			on conflict do nothing
 		`, row.InstName, row.SfinUrl, row.DomainName, row.URL)
+		q.Query(func(rows pgx.Rows) error {
+			rows.Close()
+			if err := rows.Err(); err != nil {
+				return fmt.Errorf("error with row %+v: %v", row, err)
+			}
+			if rows.CommandTag().RowsAffected() > 0 {
+				totalInserted++
+			}
+			return nil
+		})
 	}
 	br := conn.SendBatch(context.Background(), batch)
-	defer br.Close()
-
-	var totalInserted int64
-	for range orgs {
-		cmdTag, err := br.Exec()
-		if err != nil {
-			return 0, err
-		}
-		if cmdTag.RowsAffected() > 0 {
-			totalInserted++
-		}
+	if err := br.Close(); err != nil {
+		return 0, fmt.Errorf("error inserting organizations: %v", err)
 	}
 
 	return totalInserted, nil
@@ -46,25 +49,28 @@ func insertOrganizations(conn *pgxpool.Conn, orgs []models.OrganizationRow) (int
 
 func insertAccounts(conn *pgxpool.Conn, accs []models.AccountRow) (int64, error) {
 	batch := &pgx.Batch{}
+	var totalInserted int64
+
 	for _, row := range accs {
-		batch.Queue(`
+		q := batch.Queue(`
 			insert into accounts (account_id, account_name, inst_name, currency)
 			values ($1, $2, $3, $4)
 			on conflict do nothing
 		`, row.AccountID, row.AccountName, row.InstName, row.Currency)
+		q.Query(func(rows pgx.Rows) error {
+			rows.Close()
+			if err := rows.Err(); err != nil {
+				return fmt.Errorf("error with row %+v: %v", row, err)
+			}
+			if rows.CommandTag().RowsAffected() > 0 {
+				totalInserted++
+			}
+			return nil
+		})
 	}
 	br := conn.SendBatch(context.Background(), batch)
-	defer br.Close()
-
-	var totalInserted int64
-	for range accs {
-		cmdTag, err := br.Exec()
-		if err != nil {
-			return 0, err
-		}
-		if cmdTag.RowsAffected() > 0 {
-			totalInserted++
-		}
+	if err := br.Close(); err != nil {
+		return 0, fmt.Errorf("error inserting accounts: %v", err)
 	}
 
 	return totalInserted, nil
@@ -72,25 +78,28 @@ func insertAccounts(conn *pgxpool.Conn, accs []models.AccountRow) (int64, error)
 
 func insertBalances(conn *pgxpool.Conn, bals []models.BalanceRow) (int64, error) {
 	batch := &pgx.Batch{}
+	var totalInserted int64
+
 	for _, row := range bals {
-		batch.Queue(`
+		q := batch.Queue(`
 			insert into balances (balance_id, balance_date, balance, account_id)
 			values ($1, $2, $3, $4)
 			on conflict do nothing
 		`, row.BalanceID, row.BalanceDate, row.Balance, row.AccountID)
+		q.Query(func(rows pgx.Rows) error {
+			rows.Close()
+			if err := rows.Err(); err != nil {
+				return fmt.Errorf("error with row %+v: %v", row, err)
+			}
+			if rows.CommandTag().RowsAffected() > 0 {
+				totalInserted++
+			}
+			return nil
+		})
 	}
 	br := conn.SendBatch(context.Background(), batch)
-	defer br.Close()
-
-	var totalInserted int64
-	for range bals {
-		cmdTag, err := br.Exec()
-		if err != nil {
-			return 0, err
-		}
-		if cmdTag.RowsAffected() > 0 {
-			totalInserted++
-		}
+	if err := br.Close(); err != nil {
+		return 0, fmt.Errorf("error inserting balances: %v", err)
 	}
 
 	return totalInserted, nil
@@ -126,8 +135,7 @@ func insertTransactions(conn *pgxpool.Conn, txns []models.TransactionRow) (int64
 		})
 	}
 	br := conn.SendBatch(context.Background(), batch)
-	err := br.Close()
-	if err != nil {
+	if err := br.Close(); err != nil {
 		return 0, fmt.Errorf("error inserting transactions: %v", err)
 	}
 
@@ -160,8 +168,7 @@ func updateTransactionCategories(conn *pgxpool.Conn, txns []models.TransactionRo
 		})
 	}
 	br := conn.SendBatch(context.Background(), batch)
-	err := br.Close()
-	if err != nil {
+	if err := br.Close(); err != nil {
 		return 0, fmt.Errorf("error updating transaction categories: %v", err)
 	}
 
