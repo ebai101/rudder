@@ -18,7 +18,7 @@ type Database struct {
 	Pool   *pgxpool.Pool
 }
 
-func upsertOrganizations(conn *pgxpool.Conn, orgs []models.OrganizationRow) (int64, error) {
+func insertOrganizations(conn *pgxpool.Conn, orgs []models.OrganizationRow) (int64, error) {
 	batch := &pgx.Batch{}
 	for _, row := range orgs {
 		batch.Queue(`
@@ -44,7 +44,7 @@ func upsertOrganizations(conn *pgxpool.Conn, orgs []models.OrganizationRow) (int
 	return totalInserted, nil
 }
 
-func upsertAccounts(conn *pgxpool.Conn, accs []models.AccountRow) (int64, error) {
+func insertAccounts(conn *pgxpool.Conn, accs []models.AccountRow) (int64, error) {
 	batch := &pgx.Batch{}
 	for _, row := range accs {
 		batch.Queue(`
@@ -70,7 +70,7 @@ func upsertAccounts(conn *pgxpool.Conn, accs []models.AccountRow) (int64, error)
 	return totalInserted, nil
 }
 
-func upsertBalances(conn *pgxpool.Conn, bals []models.BalanceRow) (int64, error) {
+func insertBalances(conn *pgxpool.Conn, bals []models.BalanceRow) (int64, error) {
 	batch := &pgx.Batch{}
 	for _, row := range bals {
 		batch.Queue(`
@@ -96,10 +96,12 @@ func upsertBalances(conn *pgxpool.Conn, bals []models.BalanceRow) (int64, error)
 	return totalInserted, nil
 }
 
-func upsertTransactions(conn *pgxpool.Conn, txns []models.TransactionRow) (int64, error) {
+func insertTransactions(conn *pgxpool.Conn, txns []models.TransactionRow) (int64, error) {
 	batch := &pgx.Batch{}
+	var totalInserted int64
+
 	for _, row := range txns {
-		batch.Queue(`
+		q := batch.Queue(`
 			insert into transactions (transaction_id, posted_date, description, amount, account_id, inst_name, full_description)
 			values ($1, $2, $3, $4, $5, $6, $7)
 			on conflict do nothing
@@ -112,32 +114,68 @@ func upsertTransactions(conn *pgxpool.Conn, txns []models.TransactionRow) (int64
 			row.InstName,
 			row.FullDescription,
 		)
+		q.Query(func(rows pgx.Rows) error {
+			rows.Close()
+			if err := rows.Err(); err != nil {
+				return fmt.Errorf("error with row %+v: %v", row, err)
+			}
+			if rows.CommandTag().RowsAffected() > 0 {
+				totalInserted++
+			}
+			return nil
+		})
 	}
 	br := conn.SendBatch(context.Background(), batch)
-	defer br.Close()
-
-	var totalInserted int64
-	for range txns {
-		cmdTag, err := br.Exec()
-		if err != nil {
-			return 0, err
-		}
-		if cmdTag.RowsAffected() > 0 {
-			totalInserted++
-		}
+	err := br.Close()
+	if err != nil {
+		return 0, fmt.Errorf("error inserting transactions: %v", err)
 	}
 
 	return totalInserted, nil
 }
 
-func (db Database) UpsertAll(model models.RowModel) error {
+func updateTransactionCategories(conn *pgxpool.Conn, txns []models.TransactionRow) (int64, error) {
+	batch := &pgx.Batch{}
+	var totalInserted int64
+
+	for _, row := range txns {
+		q := batch.Queue(`
+			update transactions
+			set category = $2, categorized_date = $3
+			where transaction_id = $1 and category is null
+			`,
+			row.TransactionID,
+			row.Category,
+			row.CategorizedDate,
+		)
+		q.Query(func(rows pgx.Rows) error {
+			rows.Close()
+			if err := rows.Err(); err != nil {
+				return fmt.Errorf("error with row %+v: %v", row, err)
+			}
+			if rows.CommandTag().RowsAffected() > 0 {
+				totalInserted++
+			}
+			return nil
+		})
+	}
+	br := conn.SendBatch(context.Background(), batch)
+	err := br.Close()
+	if err != nil {
+		return 0, fmt.Errorf("error updating transaction categories: %v", err)
+	}
+
+	return totalInserted, nil
+}
+
+func (db Database) InsertAll(model models.RowModel) error {
 	conn, err := db.Pool.Acquire(context.Background())
 	if err != nil {
 		return err
 	}
 	defer conn.Release()
 
-	orgsInserted, err := upsertOrganizations(conn, model.Organizations)
+	orgsInserted, err := insertOrganizations(conn, model.Organizations)
 	if err != nil {
 		return err
 	}
@@ -145,7 +183,7 @@ func (db Database) UpsertAll(model models.RowModel) error {
 		log.Printf("Inserted %d organizations\n", orgsInserted)
 	}
 
-	accsInserted, err := upsertAccounts(conn, model.Accounts)
+	accsInserted, err := insertAccounts(conn, model.Accounts)
 	if err != nil {
 		return err
 	}
@@ -153,7 +191,7 @@ func (db Database) UpsertAll(model models.RowModel) error {
 		log.Printf("Inserted %d accounts\n", accsInserted)
 	}
 
-	balsInserted, err := upsertBalances(conn, model.Balances)
+	balsInserted, err := insertBalances(conn, model.Balances)
 	if err != nil {
 		return err
 	}
@@ -161,7 +199,7 @@ func (db Database) UpsertAll(model models.RowModel) error {
 		log.Printf("Inserted %d balances\n", balsInserted)
 	}
 
-	txnsInserted, err := upsertTransactions(conn, model.Transactions)
+	txnsInserted, err := insertTransactions(conn, model.Transactions)
 	if err != nil {
 		return err
 	}
@@ -170,9 +208,28 @@ func (db Database) UpsertAll(model models.RowModel) error {
 	}
 
 	if orgsInserted == 0 && accsInserted == 0 && balsInserted == 0 && txnsInserted == 0 {
-		log.Printf("No updates at this time.")
+		log.Printf("Nothing added at this time.")
 	}
 
+	return nil
+}
+
+func (db Database) UpdateTransactionCategories(txns []models.TransactionRow) error {
+	conn, err := db.Pool.Acquire(context.Background())
+	if err != nil {
+		return err
+	}
+	defer conn.Release()
+
+	txnsUpdated, err := updateTransactionCategories(conn, txns)
+	if err != nil {
+		return err
+	}
+	if txnsUpdated > 0 {
+		log.Printf("Updated %v transaction categories\n", txnsUpdated)
+	} else {
+		log.Println("No transaction categories updated at this time.")
+	}
 	return nil
 }
 
@@ -192,7 +249,9 @@ func (db Database) GetAutocatRules() ([]models.AutoCatRule, error) {
 					json_build_object(
 						'column_name', c.column_name,
 						'operator', c."operator",
-						'filter_value', c.filter_value,
+						'filter_value_text', c.filter_value_text,
+						'filter_value_numeric', c.filter_value_numeric,
+						'filter_value_timestamptz', c.filter_value_timestamptz,
 						'criteria_order', c.criteria_order
 					)
 				) 
@@ -232,6 +291,7 @@ func (db Database) GetAutocatRules() ([]models.AutoCatRule, error) {
 		if err := json.Unmarshal([]byte(rawOverrides), &rule.Overrides); err != nil {
 			return nil, err
 		}
+		// fmt.Println(rule)
 
 		rules = append(rules, rule)
 	}

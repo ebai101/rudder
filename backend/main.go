@@ -23,13 +23,6 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// rules, err := db.GetAutocatRules()
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// fmt.Println(rules)
-	// os.Exit(0)
-
 	log.Println("Setting up API...")
 	sfinAPI := resource.SimpleFINAPI{
 		Config: &appConfig,

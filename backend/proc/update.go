@@ -35,8 +35,26 @@ func Update(appConfig *config.AppConfig, db *resource.Database, sfinAPI *resourc
 		return err
 	}
 
-	log.Println("Updating db...")
-	if err := db.UpsertAll(rowModel); err != nil {
+	log.Println("Fetching AutoCat rules...")
+	acRules, err := db.GetAutocatRules()
+	if err != nil {
+		return err
+	}
+
+	log.Println("Updating records...")
+	if err := db.InsertAll(rowModel); err != nil {
+		return err
+	}
+
+	log.Println("Categorizing new transactions...")
+	newTxns, err := CategorizeTransactions(rowModel.Transactions, acRules)
+	if err != nil {
+		return err
+	}
+	rowModel.Transactions = newTxns
+
+	log.Println("Updating transaction categories...")
+	if err := db.UpdateTransactionCategories(rowModel.Transactions); err != nil {
 		return err
 	}
 
