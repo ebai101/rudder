@@ -4,8 +4,8 @@ import (
 	"log"
 	"os"
 	"os/signal"
-	"rudder/backend/config"
-	"rudder/backend/resource"
+	"rudder/config"
+	"rudder/resource"
 	"syscall"
 
 	"github.com/go-co-op/gocron/v2"

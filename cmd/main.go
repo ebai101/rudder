@@ -2,9 +2,9 @@ package main
 
 import (
 	"log"
-	"rudder/backend/config"
-	"rudder/backend/proc"
-	"rudder/backend/resource"
+	"rudder/config"
+	"rudder/proc"
+	"rudder/resource"
 )
 
 func main() {

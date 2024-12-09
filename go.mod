@@ -1,4 +1,4 @@
-module rudder/backend
+module rudder
 
 go 1.23.3
 

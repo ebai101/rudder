@@ -2,7 +2,7 @@ package proc
 
 import (
 	"log"
-	"rudder/backend/models"
+	"rudder/models"
 	"time"
 )
 

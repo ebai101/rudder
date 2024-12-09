@@ -2,9 +2,9 @@ package proc
 
 import (
 	"log"
-	"rudder/backend/config"
-	"rudder/backend/models"
-	"rudder/backend/resource"
+	"rudder/config"
+	"rudder/models"
+	"rudder/resource"
 )
 
 func Update(appConfig *config.AppConfig, db *resource.Database, sfinAPI *resource.SimpleFINAPI, args *config.Args, numDays int) error {
