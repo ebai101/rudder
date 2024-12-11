@@ -1,10 +1,15 @@
 version: 2
 sql:
   - engine: postgresql
-    queries: db/query.sql
-    schema: db/schema.sql
+    queries: internal/database/queries/*.sql
+    schema: internal/database/migrations/*.sql
     gen:
       go:
-        package: db
-        out: db
+        package: sqlc
+        out: sqlc/
         sql_package: pgx/v5
+        overrides:
+          - db_type: "pg_catalog.numeric"
+            go_type: "github.com/shopspring/decimal.Decimal"
+          - db_type: "timestamptz"
+            go_type: "time.Time"
