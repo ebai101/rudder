@@ -30,7 +30,7 @@ type AppConfig struct {
 	SFINAuth        SimpleFINAuth
 }
 
-func loadAuth(sfinAuth SimpleFINAuth) error {
+func loadAuth(sfinAuth *SimpleFINAuth) error {
 	file, err := os.Open("sfin_auth.json")
 	if err != nil {
 		return fmt.Errorf("error opening auth file: %v", err)
@@ -42,7 +42,7 @@ func loadAuth(sfinAuth SimpleFINAuth) error {
 		return fmt.Errorf("error reading auth file: %v", err)
 	}
 
-	if err := json.Unmarshal(fileContents, &sfinAuth); err != nil {
+	if err := json.Unmarshal(fileContents, sfinAuth); err != nil {
 		return err
 	}
 
@@ -80,7 +80,7 @@ func LoadConfig() (*AppConfig, error) {
 		return nil, fmt.Errorf("error loading main config: %v", err)
 	}
 
-	if err := loadAuth(appConfig.SFINAuth); err != nil {
+	if err := loadAuth(&appConfig.SFINAuth); err != nil {
 		return nil, err
 	}
 

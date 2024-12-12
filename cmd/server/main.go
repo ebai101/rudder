@@ -4,13 +4,7 @@ import (
 	"log"
 	"rudder/internal"
 	"rudder/internal/config"
-	"rudder/internal/database"
 	"rudder/internal/handlers"
-	"rudder/util/routing"
-	"rudder/util/template"
-
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
 )
 
 func main() {
@@ -21,32 +15,14 @@ func main() {
 		log.Fatal(err)
 	}
 
-	e := bootstrap()
-	db, err := database.NewDBConnection(c)
+	app, err := internal.NewApplication(c, args)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	app := &internal.Application{
-		E:      e,
-		DB:     db,
-		Config: c,
-		Args:   args,
-	}
-
 	handlers.RegisterRoutes(app)
 
-	e.Logger.Fatal(e.Start(":4040"))
-}
+	app.Sched.Start()
 
-func bootstrap() *echo.Echo {
-	e := echo.New()
-	e.Use(middleware.Logger())
-
-	routing.SetupRouter(e)
-	template.NewTemplateRenderer(e)
-
-	e.Static("/", "assets")
-
-	return e
+	app.E.Logger.Fatal(app.E.Start(":4040"))
 }

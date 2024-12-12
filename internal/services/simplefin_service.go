@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"errors"
 	"log"
 	"rudder/internal/clients"
 	"rudder/internal/config"
@@ -65,6 +66,11 @@ func (s *SimpleFINService) SyncSimpleFIN(
 	saveCached bool,
 	numDays int,
 ) error {
+	if s.syncInProgress {
+		return errors.New("sync already in progress")
+	}
+	s.syncInProgress = true
+
 	var sfinResp models.SimpleFINResponse
 	respFilename := "sfin_last.json"
 
@@ -91,23 +97,8 @@ func (s *SimpleFINService) SyncSimpleFIN(
 	s.InsertBalances(ctx, sfinResp.Accounts)
 	s.InsertTransactions(ctx, sfinResp.Accounts)
 
-	// log.Println("Fetching AutoCat rules...")
-	// acRules, err := s.repo.
-	// if err != nil {
-	// 	return err
-	// }
-
-	// log.Println("Categorizing new transactions...")
-	// newTxns, err := CategorizeTransactions(rowModel.Transactions, acRules)
-	// if err != nil {
-	// 	return err
-	// }
-	// rowModel.Transactions = newTxns
-
-	// log.Println("Updating transaction categories...")
-	// if err := db.UpdateTransactionCategories(rowModel.Transactions); err != nil {
-	// 	return err
-	// }
+	s.syncInProgress = false
+	s.lastSyncTime = time.Now().UTC()
 
 	return nil
 }

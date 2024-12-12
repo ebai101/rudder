@@ -14,4 +14,8 @@ func RegisterRoutes(app *internal.Application) {
 		component := views.Index("Rudder")
 		return template.AssertRender(c, http.StatusOK, component)
 	})
+	app.E.GET("/click-me", func(c echo.Context) error {
+		component := views.ClickMeBody()
+		return template.AssertRender(c, http.StatusOK, component)
+	})
 }

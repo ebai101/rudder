@@ -11,14 +11,14 @@ import (
 
 type SchedService struct {
 	Config    *config.AppConfig
-	Args      *config.Args
+	Args      config.Args
 	SFIN      *SimpleFINService
 	Scheduler gocron.Scheduler
 }
 
 func NewSchedService(
 	c *config.AppConfig,
-	a *config.Args,
+	a config.Args,
 	sfin *SimpleFINService,
 ) *SchedService {
 	return &SchedService{
