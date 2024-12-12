@@ -2,43 +2,51 @@ package main
 
 import (
 	"log"
+	"rudder/internal"
 	"rudder/internal/config"
+	"rudder/internal/database"
 	"rudder/internal/handlers"
+	"rudder/util/routing"
+	"rudder/util/template"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
 
 func main() {
-	// args := config.ParseArgs()
+	args := config.ParseArgs()
 
-	appConfig, err := config.LoadConfig()
+	c, err := config.LoadConfig()
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Println(appConfig)
 
-	// if err := config.LoadConfig(appConfig); err != nil {
-	// 	log.Fatal(err)
-	// }
+	e := bootstrap()
+	db, err := database.NewDBConnection(c)
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	app := echo.New()
+	app := &internal.Application{
+		E:      e,
+		DB:     db,
+		Config: c,
+		Args:   args,
+	}
 
-	app.HTTPErrorHandler = handlers.CustomHTTPErrorHandler
+	handlers.RegisterRoutes(app)
 
-	app.Static("/", "assets")
-	app.Use(middleware.Logger())
+	e.Logger.Fatal(e.Start(":4040"))
+}
 
-	// client := clients.NewSimpleFINClient(appConfig)
+func bootstrap() *echo.Echo {
+	e := echo.New()
+	e.Use(middleware.Logger())
 
-	// db, err := database.NewDBConnection(appConfig)
-	// if err != nil {
-	// 	app.Logger.Fatalf("failed to create db connection: %s", err)
-	// }
+	routing.SetupRouter(e)
+	template.NewTemplateRenderer(e)
 
-	// repo := repositories.NewSimpleFINRepository(db)
-	// s := services.NewSimpleFINService(appConfig, client, repo)
-	// fmt.Println(s)
+	e.Static("/", "assets")
 
-	app.Logger.Fatal(app.Start(":4040"))
+	return e
 }

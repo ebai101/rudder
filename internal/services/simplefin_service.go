@@ -33,28 +33,28 @@ func NewSimpleFINService(
 
 func (s *SimpleFINService) InsertOrganizations(
 	ctx context.Context,
-	accs []models.Account,
+	accs []models.SimpleFINAccount,
 ) *sqlc.InsertOrganizationsBatchResults {
 	return s.repo.InsertOrganizations(ctx, accs)
 }
 
 func (s *SimpleFINService) InsertAccounts(
 	ctx context.Context,
-	accs []models.Account,
+	accs []models.SimpleFINAccount,
 ) *sqlc.InsertAccountsBatchResults {
 	return s.repo.InsertAccounts(ctx, accs)
 }
 
 func (s *SimpleFINService) InsertBalances(
 	ctx context.Context,
-	accs []models.Account,
+	accs []models.SimpleFINAccount,
 ) *sqlc.InsertBalancesBatchResults {
 	return s.repo.InsertBalances(ctx, accs)
 }
 
 func (s *SimpleFINService) InsertTransactions(
 	ctx context.Context,
-	accs []models.Account,
+	accs []models.SimpleFINAccount,
 ) *sqlc.InsertTransactionsBatchResults {
 	return s.repo.InsertTransactions(ctx, accs)
 }

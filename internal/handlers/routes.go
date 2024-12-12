@@ -1,6 +1,17 @@
 package handlers
 
-import "github.com/labstack/echo/v4"
+import (
+	"net/http"
+	"rudder/internal"
+	"rudder/internal/views"
+	"rudder/util/template"
 
-func SetupRoutes(app *echo.Echo) {
+	"github.com/labstack/echo/v4"
+)
+
+func RegisterRoutes(app *internal.Application) {
+	app.E.GET("/", func(c echo.Context) error {
+		component := views.Index("Rudder")
+		return template.AssertRender(c, http.StatusOK, component)
+	})
 }

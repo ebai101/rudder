@@ -21,18 +21,3 @@ insert into transactions (
         full_description
     )
 values ($1, $2, $3, $4, $5, $6, $7) on conflict do nothing;
-
--- name: GetTransactionRows :many
-select transaction_id,
-    posted_date,
-    description,
-    category,
-    amount,
-    account_id,
-    inst_name,
-    full_description,
-    added_date,
-    categorized_date,
-    note,
-    check_num
-from transactions;

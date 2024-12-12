@@ -1,0 +1,37 @@
+package routing
+
+import (
+	"net/http"
+	"rudder/util/resp"
+
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
+	"golang.org/x/time/rate"
+)
+
+func SetupRouter(e *echo.Echo) {
+	e.HTTPErrorHandler = httpErrorHandler
+
+	e.Pre(middleware.RemoveTrailingSlash())
+	e.Use(middleware.Recover())
+	e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(
+		rate.Limit(20),
+	)))
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins: []string{"*.a.run.app", "*.vercel.app", "*://localhost:*"},
+	}))
+}
+
+func httpErrorHandler(err error, c echo.Context) {
+	code := http.StatusInternalServerError
+	if he, ok := err.(*echo.HTTPError); ok {
+		code = he.Code
+	}
+
+	if code != http.StatusInternalServerError {
+		_ = c.JSON(code, err)
+	} else {
+		c.Logger().Error(err)
+		_ = resp.HTTPServerError(c)
+	}
+}

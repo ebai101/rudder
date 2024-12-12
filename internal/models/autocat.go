@@ -1,13 +1,9 @@
 package models
 
 import (
-	"regexp"
-	"strings"
 	"time"
 
 	"github.com/shopspring/decimal"
-	"golang.org/x/text/cases"
-	"golang.org/x/text/language"
 )
 
 type AutocatOverride struct {
@@ -30,64 +26,64 @@ type AutocatRule struct {
 	Overrides []AutocatOverride
 }
 
-func getValueName(str string) string {
-	words := strings.Split(str, "_")
-	caser := cases.Title(language.English)
-	for i := range words {
-		if words[i] == "id" {
-			words[i] = "ID"
-		} else {
-			words[i] = caser.String(words[i])
-		}
-	}
-	converted := strings.Join(words, "")
-	return converted
-}
+// func getValueName(str string) string {
+// 	words := strings.Split(str, "_")
+// 	caser := cases.Title(language.English)
+// 	for i := range words {
+// 		if words[i] == "id" {
+// 			words[i] = "ID"
+// 		} else {
+// 			words[i] = caser.String(words[i])
+// 		}
+// 	}
+// 	converted := strings.Join(words, "")
+// 	return converted
+// }
 
-func matchDecimal(c decimal.Decimal, t decimal.Decimal, operator string) bool {
-	switch operator {
-	case "equals":
-		return t.Equal(c)
-	case "min":
-		return t.GreaterThanOrEqual(c)
-	case "max":
-		return t.LessThanOrEqual(c)
-	default:
-		return false
-	}
-}
+// func matchDecimal(c decimal.Decimal, t decimal.Decimal, operator string) bool {
+// 	switch operator {
+// 	case "equals":
+// 		return t.Equal(c)
+// 	case "min":
+// 		return t.GreaterThanOrEqual(c)
+// 	case "max":
+// 		return t.LessThanOrEqual(c)
+// 	default:
+// 		return false
+// 	}
+// }
 
-func matchTime(c time.Time, t time.Time, operator string) bool {
-	switch operator {
-	case "min":
-		return t.After(c) || t.Equal(c)
-	case "max":
-		return t.Before(c) || t.Equal(c)
-	default:
-		return false
-	}
-}
+// func matchTime(c time.Time, t time.Time, operator string) bool {
+// 	switch operator {
+// 	case "min":
+// 		return t.After(c) || t.Equal(c)
+// 	case "max":
+// 		return t.Before(c) || t.Equal(c)
+// 	default:
+// 		return false
+// 	}
+// }
 
-func matchString(c string, t string, operator string) bool {
-	tLower := strings.ToLower(t)
-	cLower := strings.ToLower(c)
+// func matchString(c string, t string, operator string) bool {
+// 	tLower := strings.ToLower(t)
+// 	cLower := strings.ToLower(c)
 
-	switch operator {
-	case "equals":
-		return tLower == cLower
-	case "contains":
-		return strings.Contains(tLower, cLower)
-	case "starts_with":
-		return strings.HasPrefix(tLower, cLower)
-	case "ends_with":
-		return strings.HasSuffix(tLower, cLower)
-	case "regex":
-		match, _ := regexp.MatchString(c, tLower)
-		return match
-	default:
-		return false
-	}
-}
+// 	switch operator {
+// 	case "equals":
+// 		return tLower == cLower
+// 	case "contains":
+// 		return strings.Contains(tLower, cLower)
+// 	case "starts_with":
+// 		return strings.HasPrefix(tLower, cLower)
+// 	case "ends_with":
+// 		return strings.HasSuffix(tLower, cLower)
+// 	case "regex":
+// 		match, _ := regexp.MatchString(c, tLower)
+// 		return match
+// 	default:
+// 		return false
+// 	}
+// }
 
 // func (c AutocatCriterion) matches(txn TransactionRow) bool {
 // 	txnVal := reflect.ValueOf(txn)

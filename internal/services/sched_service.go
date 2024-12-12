@@ -3,14 +3,18 @@ package services
 import (
 	"context"
 	"log"
-	"os"
-	"os/signal"
 	"rudder/internal/config"
-	"syscall"
 
 	"github.com/go-co-op/gocron/v2"
 	"github.com/google/uuid"
 )
+
+type SchedService struct {
+	Config    *config.AppConfig
+	Args      *config.Args
+	SFIN      *SimpleFINService
+	Scheduler gocron.Scheduler
+}
 
 func NewSchedService(
 	c *config.AppConfig,
@@ -24,13 +28,12 @@ func NewSchedService(
 	}
 }
 
-type SchedService struct {
-	Config *config.AppConfig
-	Args   *config.Args
-	SFIN   *SimpleFINService
-}
-
-func (s SchedService) makeJob(sched gocron.Scheduler, crontab string, name string, days int) error {
+func (s *SchedService) makeJob(
+	sched gocron.Scheduler,
+	crontab string,
+	name string,
+	days int,
+) error {
 	_, err := sched.NewJob(
 		gocron.CronJob(crontab, false),
 		gocron.NewTask(
@@ -59,29 +62,30 @@ func (s SchedService) makeJob(sched gocron.Scheduler, crontab string, name strin
 	return err
 }
 
-func (s SchedService) StartScheduler() error {
+func (s *SchedService) Start() error {
 	sched, err := gocron.NewScheduler(gocron.WithLocation(s.Config.Location))
 	if err != nil {
 		return err
 	}
+	s.Scheduler = sched
 
-	s.makeJob(sched, "* * * * *", "hourly", s.Config.HourlyPullDays)
-	s.makeJob(sched, "0 5 * * *", "daily", s.Config.DailyPullDays)
-	s.makeJob(sched, "0 6 * * 6", "weekly", s.Config.WeeklyPullDays)
+	s.makeJob(s.Scheduler, "* * * * *", "hourly", s.Config.HourlyPullDays)
+	s.makeJob(s.Scheduler, "0 5 * * *", "daily", s.Config.DailyPullDays)
+	s.makeJob(s.Scheduler, "0 6 * * 6", "weekly", s.Config.WeeklyPullDays)
 
-	sched.Start()
+	s.Scheduler.Start()
 	for _, job := range sched.Jobs() {
 		name := job.Name()
 		nextRun, _ := job.NextRun()
 		log.Printf("%v job scheduled for %v\n", name, nextRun)
 	}
 
-	// block until sigint/sigterm
-	done := make(chan os.Signal, 1)
-	signal.Notify(done, syscall.SIGINT, syscall.SIGTERM)
-	<-done
+	return nil
+}
 
-	log.Println("Shutting down")
-	err = sched.Shutdown()
-	return err
+func (s *SchedService) Stop() error {
+	if s.Scheduler != nil {
+		return s.Scheduler.Shutdown()
+	}
+	return nil
 }

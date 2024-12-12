@@ -25,7 +25,7 @@ func NewSimpleFINRepository(db *database.DBConnection) *SimpleFINRepository {
 
 func (r *SimpleFINRepository) InsertAccounts(
 	ctx context.Context,
-	accs []models.Account,
+	accs []models.SimpleFINAccount,
 ) *sqlc.InsertAccountsBatchResults {
 	var params []sqlc.InsertAccountsParams
 	for _, acc := range accs {
@@ -41,7 +41,7 @@ func (r *SimpleFINRepository) InsertAccounts(
 
 func (r *SimpleFINRepository) InsertOrganizations(
 	ctx context.Context,
-	accs []models.Account,
+	accs []models.SimpleFINAccount,
 ) *sqlc.InsertOrganizationsBatchResults {
 	var params []sqlc.InsertOrganizationsParams
 	for _, acc := range accs {
@@ -57,7 +57,7 @@ func (r *SimpleFINRepository) InsertOrganizations(
 
 func (r *SimpleFINRepository) InsertBalances(
 	ctx context.Context,
-	accs []models.Account,
+	accs []models.SimpleFINAccount,
 ) *sqlc.InsertBalancesBatchResults {
 	var params []sqlc.InsertBalancesParams
 	for _, acc := range accs {
@@ -76,7 +76,7 @@ func (r *SimpleFINRepository) InsertBalances(
 
 func (r *SimpleFINRepository) InsertTransactions(
 	ctx context.Context,
-	accs []models.Account,
+	accs []models.SimpleFINAccount,
 ) *sqlc.InsertTransactionsBatchResults {
 	var params []sqlc.InsertTransactionsParams
 
