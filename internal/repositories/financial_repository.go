@@ -35,7 +35,7 @@ func (r *FinancialRepository) GetBalanceRows(
 	ctx context.Context,
 	limit int32,
 ) ([]sqlc.GetBalanceRowsRow, error) {
-	return r.queries.GetBalanceRows(ctx, limit)
+	return r.queries.GetBalanceRows(ctx)
 }
 
 func (r *FinancialRepository) GetOrganizationRows(

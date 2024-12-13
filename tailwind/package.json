@@ -5,7 +5,7 @@
     "main": "index.js",
     "scripts": {
         "prod": "npx tailwindcss -i base.css -o ../assets/css/main.css --minify",
-        "dev": "npx tailwindcss -i base.css -o ../assets/css/main.css --watch"
+        "dev": "npx tailwindcss -i base.css -o ../assets/css/main.css --watch --minify"
     },
     "keywords": [],
     "author": "ebai101",
