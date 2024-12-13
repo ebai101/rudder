@@ -3,6 +3,7 @@ package views
 import (
     "fmt"
     "rudder/internal/models"
+    "rudder/util/ternary"
 )
 
 templ Transactions(txns []models.Transaction) {
@@ -15,12 +16,15 @@ templ txnPage(txns []models.Transaction) {
     <table class="table">
         <thead>
             <tr class="h-16">
-                <th></th> 
                 <th>Date</th>
                 <th>Description</th>
                 <th>Category</th>
                 <th>Amount</th>
-                <th></th>
+                <th>Account</th>
+                <th>Organization</th>
+                <th>Full Description</th>
+                <th>Date Added</th>
+                <th>Date Categorized</th>
             </tr>
         </thead> 
         <tbody>
@@ -33,11 +37,14 @@ templ txnPage(txns []models.Transaction) {
 
 templ TxnRow(txn models.Transaction) {
 	<tr class="h-16" id={ fmt.Sprintf("row-id-%s", txn.TransactionID) }>
-		<th></th>
-		<th>{ fmt.Sprintf("%v", txn.PostedDate) }</th>
-		<th>{ fmt.Sprintf("%s", txn.Description) }</th>
-		<th>{ fmt.Sprintf("%s", txn.Category) }</th>
-		<th>{ fmt.Sprintf("%v", txn.Amount) }</th>
-		<th></th>
+		<td>{ txn.PostedDate.Format("1/2/06") }</td>
+		<td>{ txn.Description }</td>
+		<td>{ txn.Category }</td>
+		<td>{ fmt.Sprintf("$%v", txn.Amount) }</td>
+		<td>{ txn.AccountID }</td>
+		<td>{ txn.InstName }</td>
+		<td>{ txn.FullDescription }</td>
+		<td>{ txn.AddedDate.Format("1/2/06") }</td>
+		<td>{ ternary.TimeFmt(txn.CategorizedDate, "1/2/06") }</td>
 	</tr> 
 }

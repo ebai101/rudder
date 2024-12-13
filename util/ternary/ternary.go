@@ -1,6 +1,8 @@
 // Package tern implements ternary-like operator
 package ternary
 
+import "time"
+
 // String returns non nil value if available
 func String(a, b string) string {
 	if len(a) > 0 {
@@ -23,6 +25,14 @@ func Int(a, b int) int {
 		return a
 	}
 	return b
+}
+
+// TimeFmt returns a formatted time if available
+func TimeFmt(t time.Time, f string) string {
+	if t.IsZero() {
+		return ""
+	}
+	return t.Format(f)
 }
 
 // Min returns the smaller of a or b
