@@ -97,9 +97,3 @@ func (r *SimpleFINRepository) InsertTransactions(
 	}
 	return r.queries.InsertTransactions(ctx, params)
 }
-
-func (r *SimpleFINRepository) GetTransactionRows(
-	ctx context.Context,
-) ([]sqlc.GetTransactionRowsRow, error) {
-	return r.queries.GetTransactionRows(ctx)
-}

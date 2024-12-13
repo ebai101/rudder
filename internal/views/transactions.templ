@@ -1,0 +1,43 @@
+package views
+
+import (
+    "fmt"
+    "rudder/internal/models"
+)
+
+templ Transactions(txns []models.Transaction) {
+    @DocType()
+    @Head()
+    @Body(txnPage(txns))
+}
+
+templ txnPage(txns []models.Transaction) {
+    <table class="table">
+        <thead>
+            <tr class="h-16">
+                <th></th> 
+                <th>Date</th>
+                <th>Description</th>
+                <th>Category</th>
+                <th>Amount</th>
+                <th></th>
+            </tr>
+        </thead> 
+        <tbody>
+            for _, txn := range txns {
+                @TxnRow(txn)
+            }
+        </tbody>
+    </table>
+}
+
+templ TxnRow(txn models.Transaction) {
+	<tr class="h-16" id={ fmt.Sprintf("row-id-%s", txn.TransactionID) }>
+		<th></th>
+		<th>{ fmt.Sprintf("%v", txn.PostedDate) }</th>
+		<th>{ fmt.Sprintf("%s", txn.Description) }</th>
+		<th>{ fmt.Sprintf("%s", txn.Category) }</th>
+		<th>{ fmt.Sprintf("%v", txn.Amount) }</th>
+		<th></th>
+	</tr> 
+}

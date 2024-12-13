@@ -18,6 +18,7 @@ type Application struct {
 	DB     *database.DBConnection
 	Config *config.AppConfig
 	Args   config.Args
+	F      *services.FinancialService
 	SFIN   *services.SimpleFINService
 	AC     *services.AutocatService
 	Sched  *services.SchedService
@@ -40,11 +41,15 @@ func NewApplication(c *config.AppConfig, args config.Args) (*Application, error)
 
 	sched := services.NewSchedService(c, args, sfin)
 
+	finR := repositories.NewFinancialRepository(db)
+	fin := services.NewFinancialService(finR)
+
 	app := &Application{
 		E:      e,
 		DB:     db,
 		Config: c,
 		Args:   args,
+		F:      fin,
 		SFIN:   sfin,
 		AC:     ac,
 		Sched:  sched,
@@ -60,7 +65,7 @@ func bootstrapEcho() *echo.Echo {
 	routing.SetupRouter(e)
 	template.NewTemplateRenderer(e)
 
-	e.Static("/", "assets")
+	e.Static("/static", "assets")
 
 	return e
 }

@@ -1,0 +1,17 @@
+{
+    "name": "rudder",
+    "version": "0.1.0",
+    "description": "rudder",
+    "main": "index.js",
+    "scripts": {
+        "watch-css": "npx tailwindcss -i base.css -o ../assets/css/main.css --watch",
+        "build-css-prod": "npx tailwindcss -i base.css -o ../assets/css/main.css --minify"
+    },
+    "keywords": [],
+    "author": "ebai101",
+    "license": "MIT",
+    "devDependencies": {
+        "daisyui": "^4.10.2",
+        "tailwindcss": "^3.4.3"
+    }
+}

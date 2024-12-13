@@ -36,4 +36,6 @@ select transaction_id,
     categorized_date,
     note,
     check_num
-from transactions;
+from transactions
+order by posted_date desc
+limit $1;

@@ -22,7 +22,10 @@ func main() {
 
 	handlers.RegisterRoutes(app)
 
-	app.Sched.Start()
+	// test stuff
+	// app.Sched.Start()
+	// app.SFIN.SyncSimpleFIN(context.Background(), args.UseCached, args.SaveCached, 7)
+	// app.AC.CategorizeTransactions(context.Background())
 
 	app.E.Logger.Fatal(app.E.Start(":4040"))
 }
