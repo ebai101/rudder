@@ -6,12 +6,6 @@ import (
 )
 
 templ Accounts(accs []models.Account) {
-    @DocType()
-    @Head()
-    @Body(accPage(accs))
-}
-
-templ accPage(accs []models.Account) {
     <table class="table">
         <thead>
             <tr class="h-16">

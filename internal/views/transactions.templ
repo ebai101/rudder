@@ -7,12 +7,6 @@ import (
 )
 
 templ Transactions(txns []models.Transaction) {
-    @DocType()
-    @Head()
-    @Body(txnPage(txns))
-}
-
-templ txnPage(txns []models.Transaction) {
     <table class="table">
         <thead>
             <tr class="h-16">
@@ -29,13 +23,13 @@ templ txnPage(txns []models.Transaction) {
         </thead> 
         <tbody>
             for _, txn := range txns {
-                @TxnRow(txn)
+                @TransactionRow(txn)
             }
         </tbody>
     </table>
 }
 
-templ TxnRow(txn models.Transaction) {
+templ TransactionRow(txn models.Transaction) {
 	<tr class="h-16" id={ fmt.Sprintf("row-id-%s", txn.TransactionID) }>
 		<td>{ txn.PostedDate.Format("1/2/06") }</td>
 		<td>{ txn.Description }</td>

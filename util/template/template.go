@@ -3,6 +3,7 @@ package template
 import (
 	"errors"
 	"io"
+	"rudder/internal/views"
 
 	"github.com/a-h/templ"
 	"github.com/labstack/echo/v4"
@@ -29,5 +30,10 @@ func newTemplate() echo.Renderer {
 }
 
 func AssertRender(c echo.Context, statusCode int, component templ.Component) error {
-	return c.Render(statusCode, "", component)
+	isHtmxRequest := c.Request().Header.Get("HX-Request") == "true"
+
+	if isHtmxRequest {
+		return c.Render(statusCode, "", component)
+	}
+	return c.Render(statusCode, "", views.FullPage(component))
 }

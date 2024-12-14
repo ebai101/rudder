@@ -6,12 +6,6 @@ import (
 )
 
 templ Autocat(rules []models.AutocatRule) {
-    @DocType()
-    @Head()
-    @Body(autocatPage(rules))
-}
-
-templ autocatPage(rules []models.AutocatRule) {
     <table class="table">
         <thead>
             <tr class="h-16">
