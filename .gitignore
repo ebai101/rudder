@@ -24,3 +24,4 @@ sqlc/
 tmp/
 tailwind/node_modules
 .DS_Store
+assets/css/main.css
