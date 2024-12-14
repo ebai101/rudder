@@ -30,17 +30,3 @@ func (r *FinancialRepository) GetAccountRows(
 ) ([]sqlc.GetAccountRowsRow, error) {
 	return r.queries.GetAccountRows(ctx)
 }
-
-func (r *FinancialRepository) GetBalanceRows(
-	ctx context.Context,
-	limit int32,
-) ([]sqlc.GetBalanceRowsRow, error) {
-	return r.queries.GetBalanceRows(ctx)
-}
-
-func (r *FinancialRepository) GetOrganizationRows(
-	ctx context.Context,
-	limit int32,
-) ([]sqlc.GetOrganizationRowsRow, error) {
-	return r.queries.GetOrganizationRows(ctx)
-}

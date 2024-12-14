@@ -51,3 +51,9 @@ func (r *AutocatRepository) UpdateTransactionCategories(
 
 	return r.queries.UpdateTransactionCategories(ctx, params)
 }
+
+func (r *AutocatRepository) GetAutocatRules(
+	ctx context.Context,
+) ([]sqlc.GetAutocatRulesRow, error) {
+	return r.queries.GetAutocatRules(ctx)
+}

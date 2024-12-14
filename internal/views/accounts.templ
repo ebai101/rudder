@@ -1,0 +1,41 @@
+package views
+
+import (
+    "fmt"
+    "rudder/internal/models"
+)
+
+templ Accounts(accs []models.Account) {
+    @DocType()
+    @Head()
+    @Body(accPage(accs))
+}
+
+templ accPage(accs []models.Account) {
+    <table class="table">
+        <thead>
+            <tr class="h-16">
+                <th>Account Name</th>
+                <th>Institution</th>
+                <th>Balance</th>
+                <th>Type</th>
+                <th>Class</th>
+            </tr>
+        </thead> 
+        <tbody>
+            for _, acc := range accs {
+                @AccRow(acc)
+            }
+        </tbody>
+    </table>
+}
+
+templ AccRow(acc models.Account) {
+	<tr class="h-16" id={ fmt.Sprintf("row-id-%s", acc.AccountID) }>
+		<td>{ acc.AccountName }</td>
+		<td>{ acc.InstName }</td>
+		<td>{ fmt.Sprintf("$%v", acc.CurrentBalance.String()) }</td>
+		<td>{ acc.AccountType }</td>
+		<td>{ acc.AccountClass }</td>
+	</tr> 
+}

@@ -41,7 +41,7 @@ templ TxnRow(txn models.Transaction) {
 		<td>{ txn.Description }</td>
 		<td>{ txn.Category }</td>
 		<td>{ fmt.Sprintf("$%v", txn.Amount) }</td>
-		<td>{ txn.AccountID }</td>
+		<td>{ txn.AccountName }</td>
 		<td>{ txn.InstName }</td>
 		<td>{ txn.FullDescription }</td>
 		<td>{ txn.AddedDate.Format("1/2/06") }</td>

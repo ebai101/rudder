@@ -11,6 +11,11 @@ import (
 
 func RegisterRoutes(app *internal.Application) {
 	app.E.GET("/", func(c echo.Context) error {
+		component := views.Index()
+		return template.AssertRender(c, http.StatusOK, component)
+	})
+
+	app.E.GET("/transactions", func(c echo.Context) error {
 		ctx := c.Request().Context()
 
 		txns, err := app.F.GetTransactions(ctx, 50)
@@ -19,6 +24,30 @@ func RegisterRoutes(app *internal.Application) {
 		}
 
 		component := views.Transactions(txns)
+		return template.AssertRender(c, http.StatusOK, component)
+	})
+
+	app.E.GET("/accounts", func(c echo.Context) error {
+		ctx := c.Request().Context()
+
+		accs, err := app.F.GetAccounts(ctx)
+		if err != nil {
+			c.Logger().Error(err)
+		}
+
+		component := views.Accounts(accs)
+		return template.AssertRender(c, http.StatusOK, component)
+	})
+
+	app.E.GET("/autocat", func(c echo.Context) error {
+		ctx := c.Request().Context()
+
+		rules, err := app.AC.GetAutocatRules(ctx)
+		if err != nil {
+			c.Logger().Error(err)
+		}
+
+		component := views.Autocat(rules)
 		return template.AssertRender(c, http.StatusOK, component)
 	})
 }

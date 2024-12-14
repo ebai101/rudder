@@ -20,13 +20,14 @@ type Organization struct {
 }
 
 type Account struct {
-	AccountID    string `validate:"required"`
-	AccountName  string `validate:"required"`
-	InstName     string `validate:"required"`
-	AccountType  string
-	AccountClass string
-	Currency     string `validate:"required"`
-	Active       bool   `validate:"required"`
+	AccountID      string `validate:"required"`
+	AccountName    string `validate:"required"`
+	InstName       string `validate:"required"`
+	AccountType    string
+	AccountClass   string
+	Currency       string `validate:"required"`
+	Active         bool   `validate:"required"`
+	CurrentBalance decimal.Decimal
 }
 
 type Balance struct {
@@ -44,9 +45,10 @@ type Transaction struct {
 	Category        string
 	Amount          decimal.Decimal `validate:"required"`
 	AccountID       string          `validate:"required"`
-	InstName        string          `validate:"required"`
-	FullDescription string          `validate:"required"`
-	AddedDate       time.Time       `validate:"required"`
+	AccountName     string
+	InstName        string    `validate:"required"`
+	FullDescription string    `validate:"required"`
+	AddedDate       time.Time `validate:"required"`
 	CategorizedDate time.Time
 	Note            string
 	CheckNum        string

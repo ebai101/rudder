@@ -112,7 +112,8 @@ set category = $2,
 where transaction_id = $1;
 
 -- name: GetAutocatRules :many
-select (
+select r.id,
+    (
         select json_agg (
                 json_build_object (
                     'column_name',

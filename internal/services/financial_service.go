@@ -34,7 +34,7 @@ func (s *FinancialService) GetTransactions(
 			Description:     row.Description.String,
 			Category:        row.Category.String,
 			Amount:          row.Amount,
-			AccountID:       row.AccountID,
+			AccountName:     row.AccountName,
 			InstName:        row.InstName,
 			FullDescription: row.FullDescription,
 			AddedDate:       row.AddedDate,
@@ -45,4 +45,27 @@ func (s *FinancialService) GetTransactions(
 	}
 
 	return txns, nil
+}
+
+func (s *FinancialService) GetAccounts(ctx context.Context) ([]models.Account, error) {
+	rows, err := s.repo.GetAccountRows(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var accs []models.Account
+	for _, row := range rows {
+		accs = append(accs, models.Account{
+			AccountID:      row.AccountID,
+			AccountName:    row.AccountName,
+			InstName:       row.InstName,
+			AccountType:    string(row.AccountType.AccountTypeT),
+			AccountClass:   string(row.AccountClass.AccountClassT),
+			Currency:       row.Currency,
+			Active:         row.Active,
+			CurrentBalance: row.Balance,
+		})
+	}
+
+	return accs, nil
 }

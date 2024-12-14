@@ -1,41 +1,40 @@
--- name: GetOrganizationRows :many
-select inst_name,
-    sfin_url,
-    domain_name,
-    url
-from organizations;
-
 -- name: GetAccountRows :many
-select account_id,
-    account_name,
-    inst_name,
-    account_type,
-    account_class,
-    currency,
-    active
-from accounts;
-
--- name: GetBalanceRows :many
-select balance_id,
-    balance_date,
-    balance,
-    account_id,
-    added_date
-from balances;
+with ranked_balances as (
+    select account_id,
+        balance,
+        balance_date,
+        row_number() over (
+            partition by account_id
+            order by balance_date desc
+        ) as rank
+    from balances
+)
+select a.account_id,
+    a.account_name,
+    a.inst_name,
+    rb.balance,
+    a.account_type,
+    a.account_class,
+    a.currency,
+    a.active
+from accounts a
+    join ranked_balances rb on a.account_id = rb.account_id
+    and rb.rank = 1;
 
 -- name: GetTransactionRows :many
-select transaction_id,
-    posted_date,
-    description,
-    category,
-    amount,
-    account_id,
-    inst_name,
-    full_description,
-    added_date,
-    categorized_date,
-    note,
-    check_num
-from transactions
+select t.transaction_id,
+    t.posted_date,
+    t.description,
+    t.category,
+    t.amount,
+    a.account_name,
+    t.inst_name,
+    t.full_description,
+    t.added_date,
+    t.categorized_date,
+    t.note,
+    t.check_num
+from transactions t
+    join accounts a on t.account_id = a.account_id
 order by posted_date desc
 limit $1;
