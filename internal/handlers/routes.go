@@ -6,13 +6,23 @@ import (
 	"rudder/internal/views"
 	"rudder/util/template"
 
+	"github.com/a-h/templ"
 	"github.com/labstack/echo/v4"
 )
 
+func RenderHTMX(c echo.Context, component templ.Component) error {
+	isHtmxRequest := c.Request().Header.Get("HX-Request") == "true"
+
+	if isHtmxRequest {
+		return template.AssertRender(c, http.StatusOK, component)
+	}
+	return template.AssertRender(c, http.StatusOK, views.FullPage(component))
+}
+
 func RegisterRoutes(app *internal.Application) {
 	app.E.GET("/", func(c echo.Context) error {
-		component := views.Index()
-		return template.AssertRender(c, http.StatusOK, component)
+		component := views.Index(template.ChartComponent(BarChart()))
+		return RenderHTMX(c, component)
 	})
 
 	app.E.GET("/transactions", func(c echo.Context) error {
@@ -24,7 +34,7 @@ func RegisterRoutes(app *internal.Application) {
 		}
 
 		component := views.Transactions(txns)
-		return template.AssertRender(c, http.StatusOK, component)
+		return RenderHTMX(c, component)
 	})
 
 	app.E.GET("/accounts", func(c echo.Context) error {
@@ -36,7 +46,7 @@ func RegisterRoutes(app *internal.Application) {
 		}
 
 		component := views.Accounts(accs)
-		return template.AssertRender(c, http.StatusOK, component)
+		return RenderHTMX(c, component)
 	})
 
 	app.E.GET("/autocat", func(c echo.Context) error {
@@ -48,6 +58,6 @@ func RegisterRoutes(app *internal.Application) {
 		}
 
 		component := views.Autocat(rules)
-		return template.AssertRender(c, http.StatusOK, component)
+		return RenderHTMX(c, component)
 	})
 }

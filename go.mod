@@ -3,6 +3,7 @@ module rudder
 go 1.23.3
 
 require (
+	github.com/go-echarts/go-echarts/v2 v2.4.6
 	github.com/google/uuid v1.6.0
 	github.com/jackc/pgx-shopspring-decimal v0.0.0-20220624020537-1d36b5a1853e
 	github.com/jackc/pgx/v5 v5.7.1

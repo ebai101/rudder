@@ -1,15 +1,18 @@
 package template
 
 import (
+	"context"
 	"errors"
 	"io"
-	"rudder/internal/views"
 
 	"github.com/a-h/templ"
 	"github.com/labstack/echo/v4"
 )
 
 type Template struct{}
+type Renderable interface {
+	Render(w io.Writer) error
+}
 
 func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
 	component, valid := data.(templ.Component)
@@ -30,10 +33,11 @@ func newTemplate() echo.Renderer {
 }
 
 func AssertRender(c echo.Context, statusCode int, component templ.Component) error {
-	isHtmxRequest := c.Request().Header.Get("HX-Request") == "true"
+	return c.Render(statusCode, "", component)
+}
 
-	if isHtmxRequest {
-		return c.Render(statusCode, "", component)
-	}
-	return c.Render(statusCode, "", views.FullPage(component))
+func ChartComponent(chart Renderable) templ.Component {
+	return templ.ComponentFunc(func(ctx context.Context, w io.Writer) error {
+		return chart.Render(w)
+	})
 }

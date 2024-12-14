@@ -7,8 +7,8 @@ live/server:
 live/tailwind:
 	cd tailwind && npm run dev
 
-# live/sync_assets:
-# 	arelo -t './assets' -p '**/*.css' -p '**/*.js' -- templ generate --notify-proxy
+live/sync_assets:
+	arelo -t './assets' -p '**/*.css' -p '**/*.js' -- templ generate --notify-proxy
 
 live/sync_sqlc:
 	arelo -p '**/*.sql' -p 'sqlc.yml' -- sqlc generate
