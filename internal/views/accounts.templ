@@ -17,9 +17,10 @@ templ accPage(accs []models.Account) {
             <tr class="h-16">
                 <th>Account Name</th>
                 <th>Institution</th>
-                <th>Balance</th>
                 <th>Type</th>
                 <th>Class</th>
+                <th>Balance</th>
+                <th>Balance Date</th>
             </tr>
         </thead> 
         <tbody>
@@ -34,8 +35,9 @@ templ AccRow(acc models.Account) {
 	<tr class="h-16" id={ fmt.Sprintf("row-id-%s", acc.AccountID) }>
 		<td>{ acc.AccountName }</td>
 		<td>{ acc.InstName }</td>
-		<td>{ fmt.Sprintf("$%v", acc.CurrentBalance.String()) }</td>
 		<td>{ acc.AccountType }</td>
 		<td>{ acc.AccountClass }</td>
+		<td>{ fmt.Sprintf("$%v", acc.Balance.String()) }</td>
+		<td>{ acc.BalanceDate.Format("1/2/06") }</td>
 	</tr> 
 }

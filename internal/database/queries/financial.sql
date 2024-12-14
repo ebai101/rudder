@@ -3,6 +3,7 @@ with ranked_balances as (
     select account_id,
         balance,
         balance_date,
+        added_date,
         row_number() over (
             partition by account_id
             order by balance_date desc
@@ -12,11 +13,13 @@ with ranked_balances as (
 select a.account_id,
     a.account_name,
     a.inst_name,
-    rb.balance,
     a.account_type,
     a.account_class,
     a.currency,
-    a.active
+    a.active,
+    rb.balance,
+    rb.balance_date,
+    rb.added_date
 from accounts a
     join ranked_balances rb on a.account_id = rb.account_id
     and rb.rank = 1;

@@ -56,14 +56,16 @@ func (s *FinancialService) GetAccounts(ctx context.Context) ([]models.Account, e
 	var accs []models.Account
 	for _, row := range rows {
 		accs = append(accs, models.Account{
-			AccountID:      row.AccountID,
-			AccountName:    row.AccountName,
-			InstName:       row.InstName,
-			AccountType:    string(row.AccountType.AccountTypeT),
-			AccountClass:   string(row.AccountClass.AccountClassT),
-			Currency:       row.Currency,
-			Active:         row.Active,
-			CurrentBalance: row.Balance,
+			AccountID:        row.AccountID,
+			AccountName:      row.AccountName,
+			InstName:         row.InstName,
+			AccountType:      string(row.AccountType.AccountTypeT),
+			AccountClass:     string(row.AccountClass.AccountClassT),
+			Currency:         row.Currency,
+			Active:           row.Active,
+			Balance:          row.Balance,
+			BalanceDate:      row.BalanceDate,
+			BalanceAddedDate: row.AddedDate,
 		})
 	}
 

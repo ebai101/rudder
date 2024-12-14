@@ -92,6 +92,7 @@ func (s *SimpleFINService) SyncSimpleFIN(
 		}
 	}
 
+	log.Printf("Inserting data...")
 	s.InsertOrganizations(ctx, sfinResp.Accounts)
 	s.InsertAccounts(ctx, sfinResp.Accounts)
 	s.InsertBalances(ctx, sfinResp.Accounts)

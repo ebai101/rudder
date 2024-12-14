@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 	"encoding/json"
+	"log"
 	"rudder/internal/models"
 	"rudder/internal/repositories"
 	"rudder/sqlc"
@@ -26,6 +27,7 @@ func NewAutocatService(
 func (s *AutocatService) CategorizeTransactions(
 	ctx context.Context,
 ) (*sqlc.UpdateTransactionCategoriesBatchResults, error) {
+	log.Printf("Categorizing transactions...")
 	matches, err := s.repo.MatchTransactions(ctx)
 	if err != nil {
 		return nil, err

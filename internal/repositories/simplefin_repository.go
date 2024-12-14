@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5/pgtype"
-	"github.com/shopspring/decimal"
 )
 
 type SimpleFINRepository struct {
@@ -67,7 +66,7 @@ func (r *SimpleFINRepository) InsertBalances(
 		params = append(params, sqlc.InsertBalancesParams{
 			BalanceID:   balID,
 			BalanceDate: balDate,
-			Balance:     decimal.Decimal{},
+			Balance:     acc.Balance,
 			AccountID:   acc.AccountId,
 		})
 	}
