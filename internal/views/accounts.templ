@@ -41,16 +41,6 @@ templ AccRow(acc models.Account) {
 	</tr>
 }
 
-templ AccountsNavbar(accs []models.Account) {
-	for _, acc := range accs {
-		{{ target := fmt.Sprintf("/accounts/%d", acc.ID) }}
-		<a class="truncate" hx-get={ target } hx-target="main" hx-swap="outerHTML" hx-replace-url="true">
-			<div class="small-width truncate">{ acc.AccountName }</div>
-			<div class="right">${ acc.Balance.StringFixed(2) }</div>
-		</a>
-	}
-}
-
 templ AccountsDetail(acc models.Account) {
 	{{ appBarParams := AppBarParams{Title: "Details", BackVisible: true, BackTarget: "/accounts", MoreVisible: false} }}
 	@AppBar(appBarParams)
@@ -90,5 +80,8 @@ templ AccountsDetail(acc models.Account) {
 				<button class="transparent"><i>group</i></button>
 			</div>
 		</article>
+		<div class="large-space"></div>
+		{{ txnListTarget := fmt.Sprintf("/accounts/%d/transactions", acc.ID) }}
+		<div hx-get={ txnListTarget } hx-trigger="load" hx-swap="outerHTML"></div>
 	</main>
 }

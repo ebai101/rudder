@@ -12,6 +12,7 @@ import (
 	"gopkg.in/validator.v2"
 )
 
+// Organization data model
 type Organization struct {
 	ID         int64
 	InstName   string `validate:"required"`
@@ -20,6 +21,7 @@ type Organization struct {
 	Url        string
 }
 
+// Account data model with balance information
 type Account struct {
 	ID               int64
 	AccountID        string `validate:"required"`
@@ -34,6 +36,14 @@ type Account struct {
 	BalanceAddedDate time.Time
 }
 
+// Simplified Account model, used for filling the navbar
+type AccountBalance struct {
+	ID          int64
+	AccountName string
+	Balance     decimal.Decimal
+}
+
+// Transaction data model with account information
 type Transaction struct {
 	ID              int64
 	TransactionID   string    `validate:"required"`

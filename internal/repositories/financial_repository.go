@@ -4,6 +4,8 @@ import (
 	"context"
 	"rudder/internal/database"
 	"rudder/sqlc"
+
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type FinancialRepository struct {
@@ -20,27 +22,52 @@ func NewFinancialRepository(db *database.DBConnection) *FinancialRepository {
 
 func (r *FinancialRepository) GetTransactionRows(
 	ctx context.Context,
-	params sqlc.GetTransactionRowsParams,
-) ([]sqlc.GetTransactionRowsRow, error) {
+	limit, offset int32,
+	desc string,
+) ([]sqlc.TransactionsView, error) {
+	params := sqlc.GetTransactionRowsParams{
+		Description: pgtype.Text{String: desc, Valid: true},
+		Limit:       limit,
+		Offset:      offset,
+	}
 	return r.queries.GetTransactionRows(ctx, params)
 }
 
 func (r *FinancialRepository) GetTransaction(
 	ctx context.Context,
 	id int64,
-) (sqlc.GetTransactionRow, error) {
+) (sqlc.TransactionsView, error) {
 	return r.queries.GetTransaction(ctx, id)
 }
 
 func (r *FinancialRepository) GetAccountRows(
 	ctx context.Context,
-) ([]sqlc.GetAccountRowsRow, error) {
+) ([]sqlc.AccountsView, error) {
 	return r.queries.GetAccountRows(ctx)
 }
 
 func (r *FinancialRepository) GetAccount(
 	ctx context.Context,
 	id int64,
-) (sqlc.GetAccountRow, error) {
+) (sqlc.AccountsView, error) {
 	return r.queries.GetAccount(ctx, id)
+}
+
+func (r *FinancialRepository) GetAccountTransactions(
+	ctx context.Context,
+	limit, offset int32,
+	id int64,
+) ([]sqlc.TransactionsView, error) {
+	params := sqlc.GetAccountTransactionsParams{
+		ID:     id,
+		Limit:  limit,
+		Offset: offset,
+	}
+	return r.queries.GetAccountTransactions(ctx, params)
+}
+
+func (r *FinancialRepository) GetAccountBalances(
+	ctx context.Context,
+) ([]sqlc.GetAccountBalancesRow, error) {
+	return r.queries.GetAccountBalances(ctx)
 }

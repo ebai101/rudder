@@ -67,7 +67,7 @@ templ TransactionsList(txns []models.Transaction, nextPage int64) {
 						<nav class="row">
 							<div class="max">
 								<h6 class="small">{ txn.Description }</h6>
-								<div>{ ternary.String(txn.Category, "No Category") }</div>
+								<div>{ ternary.String(txn.Category, "Uncategorized") }</div>
 							</div>
 							@AmountColorized("medium", txn.Amount)
 						</nav>
@@ -88,7 +88,10 @@ templ TransactionsList(txns []models.Transaction, nextPage int64) {
 }
 
 templ TransactionDetail(txn models.Transaction) {
-	{{ appBarParams := AppBarParams{Title: "Details", BackVisible: true, BackTarget: "/transactions", MoreVisible: false} }}
+	{{
+	appBarParams := AppBarParams{Title: "Details", BackVisible: true, BackTarget: "/transactions", MoreVisible: false}
+	editEndpoint := fmt.Sprintf("/transactions/detail/%d/edit", txn.ID)
+	}}
 	@AppBar(appBarParams)
 	<main class="responsive">
 		<article class="large-padding">
@@ -126,9 +129,53 @@ templ TransactionDetail(txn models.Transaction) {
 				<div class="max right-align">{ ternary.TimeFmt(txn.CategorizedDate, "1/2/06") }</div>
 			</div>
 			<div class="row">
-				<button class="transparent"><i>edit</i></button>
-				<button class="transparent"><i>group</i></button>
+				<button
+					class="transparent"
+					hx-get={ editEndpoint }
+					hx-target="article"
+					hx-swap="innerHTML"
+				><i>edit</i></button>
 			</div>
 		</article>
 	</main>
+}
+
+templ TransactionDetailEdit(txn models.Transaction) {
+	<div class="row">
+		<h6>{ txn.Description }</h6>
+		@AmountColorized("max right-align", txn.Amount)
+	</div>
+	<hr class="large"/>
+	<div class="field label small border">
+		<input type="date" value={ txn.PostedDate.Format("2006-01-02") }/>
+		<label>Date</label>
+	</div>
+	<div class="field label small border">
+		<input type="text" value={ txn.Category }/>
+		<label>Category</label>
+	</div>
+	<div class="field label small border">
+		<input type="text" value={ txn.AccountName }/>
+		<label>Account Name</label>
+	</div>
+	<div class="field label small border">
+		<input type="text" value={ txn.InstName }/>
+		<label>Organization</label>
+	</div>
+	<div class="field label small border">
+		<input type="text" value={ txn.FullDescription }/>
+		<label>Full Description</label>
+	</div>
+	<div class="field label small border">
+		<input type="text" value={ txn.AddedDate.Format("1/2/06") }/>
+		<label>Date Added</label>
+	</div>
+	<div class="row">
+		<button
+			class="transparent"
+		><i>save</i></button>
+		<button
+			class="transparent"
+		><i>cancel</i></button>
+	</div>
 }

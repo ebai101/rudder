@@ -135,3 +135,48 @@ create table transactions (
 	constraint transactions_categories_fk foreign key (category) references categories (category) on delete restrict on update cascade,
 	constraint transactions_organizations_fk foreign key (inst_name) references organizations (inst_name) on delete restrict on update cascade
 );
+
+-- public.transactions_view source
+create or replace view transactions_view as
+select t.id,
+	t.transaction_id,
+	t.posted_date,
+	t.description,
+	t.category,
+	t.amount,
+	t.account_id,
+	a.account_name,
+	t.inst_name,
+	t.full_description,
+	t.added_date,
+	t.categorized_date
+from transactions t
+	join accounts a on t.account_id = a.account_id
+order by t.posted_date desc;
+
+-- public.accounts_view source
+create or replace view accounts_view as with ranked_balances as (
+		select balances.account_id,
+			balances.balance,
+			balances.balance_date,
+			balances.added_date,
+			row_number() OVER (
+				partition BY balances.account_id
+				order by balances.balance_date desc
+			) as rank
+		from balances
+	)
+select a.id,
+	a.account_id,
+	a.account_name,
+	a.inst_name,
+	a.account_type,
+	a.account_class,
+	a.currency,
+	a.active,
+	rb.balance,
+	rb.balance_date,
+	rb.added_date
+from accounts a
+	join ranked_balances rb on a.account_id = rb.account_id
+	and rb.rank = 1;

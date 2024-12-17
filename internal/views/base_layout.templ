@@ -1,5 +1,10 @@
 package views
 
+import (
+	"fmt"
+	"rudder/internal/models"
+)
+
 templ Head() {
 	<head>
 		<meta charset="utf-8"/>
@@ -69,6 +74,16 @@ templ Nav() {
 		<hr class="medium"/>
 		<div hx-get="/accounts/navbar" hx-trigger="load" hx-swap="outerHTML"></div>
 	</nav>
+}
+
+templ AccountsNavbar(bals []models.AccountBalance) {
+	for _, bal := range bals {
+		{{ target := fmt.Sprintf("/accounts/%d", bal.ID) }}
+		<a class="truncate" hx-get={ target } hx-target="main" hx-swap="outerHTML" hx-replace-url="true">
+			<div class="small-width truncate">{ bal.AccountName }</div>
+			<div class="right">${ bal.Balance.StringFixed(2) }</div>
+		</a>
+	}
 }
 
 templ Body(component templ.Component) {

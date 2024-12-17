@@ -68,3 +68,20 @@ func (th *TransactionsHandlers) txnDetailsHandler(c echo.Context) error {
 
 	return renderView(c, views.TransactionDetail(txn))
 }
+
+func (th *TransactionsHandlers) txnDetailsEditHandler(c echo.Context) error {
+	c.Set("ISERROR", false)
+	ctx := c.Request().Context()
+
+	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
+	if err != nil {
+		return nil
+	}
+
+	txn, err := th.service.GetTransaction(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	return renderView(c, views.TransactionDetailEdit(txn))
+}

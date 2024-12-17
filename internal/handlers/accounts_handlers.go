@@ -24,7 +24,7 @@ func (ah *AccountsHandlers) accsNavbarHandler(c echo.Context) error {
 	c.Set("ISERROR", false)
 	ctx := c.Request().Context()
 
-	accs, err := ah.service.GetAccountRows(ctx)
+	accs, err := ah.service.GetAccountBalances(ctx)
 	if err != nil {
 		return err
 	}
@@ -61,5 +61,23 @@ func (ah *AccountsHandlers) accsDetailHandler(c echo.Context) error {
 	}
 
 	component := views.AccountsDetail(acc)
+	return renderView(c, component)
+}
+
+func (ah *AccountsHandlers) accsTransactionsHandler(c echo.Context) error {
+	c.Set("ISERROR", false)
+	ctx := c.Request().Context()
+
+	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
+	if err != nil {
+		return nil
+	}
+
+	txns, err := ah.service.GetAccountTransactions(ctx, 20, 0, id)
+	if err != nil {
+		return err
+	}
+
+	component := views.TransactionsList(txns, 20)
 	return renderView(c, component)
 }
