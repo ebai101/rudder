@@ -1,5 +1,9 @@
 package views
 
-templ Index(component templ.Component) {
-    @component
+templ Index() {
+	{{ params := AppBarParams{Title: "Home", BackVisible: false, MoreVisible: false} }}
+	@AppBar(params)
+	<main class="responsive">
+		Hello
+	</main>
 }

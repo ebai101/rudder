@@ -13,6 +13,7 @@ import (
 )
 
 type Organization struct {
+	ID         int64
 	InstName   string `validate:"required"`
 	SfinUrl    string `validate:"required,url"`
 	DomainName string
@@ -20,6 +21,7 @@ type Organization struct {
 }
 
 type Account struct {
+	ID               int64
 	AccountID        string `validate:"required"`
 	AccountName      string `validate:"required"`
 	InstName         string `validate:"required"`
@@ -33,6 +35,7 @@ type Account struct {
 }
 
 type Transaction struct {
+	ID              int64
 	TransactionID   string    `validate:"required"`
 	PostedDate      time.Time `validate:"required"`
 	Description     string

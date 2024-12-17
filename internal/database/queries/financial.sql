@@ -10,7 +10,8 @@ with ranked_balances as (
         ) as rank
     from balances
 )
-select a.account_id,
+select a.id,
+    a.account_id,
     a.account_name,
     a.inst_name,
     a.account_type,
@@ -25,7 +26,8 @@ from accounts a
     and rb.rank = 1;
 
 -- name: GetTransactionRows :many
-select t.transaction_id,
+select t.id,
+    t.transaction_id,
     t.posted_date,
     t.description,
     t.category,
@@ -39,5 +41,24 @@ select t.transaction_id,
     t.check_num
 from transactions t
     join accounts a on t.account_id = a.account_id
+where t.description ilike $1
 order by posted_date desc
-limit $1;
+limit $2 offset $3;
+
+-- name: GetTransaction :one
+select t.id,
+    t.transaction_id,
+    t.posted_date,
+    t.description,
+    t.category,
+    t.amount,
+    a.account_name,
+    t.inst_name,
+    t.full_description,
+    t.added_date,
+    t.categorized_date,
+    t.note,
+    t.check_num
+from transactions t
+    join accounts a on t.account_id = a.account_id
+where t.id = $1;

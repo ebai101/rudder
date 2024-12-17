@@ -4,6 +4,7 @@ import (
 	"rudder/internal/clients"
 	"rudder/internal/config"
 	"rudder/internal/database"
+	"rudder/internal/handlers"
 	"rudder/internal/repositories"
 	"rudder/internal/services"
 	"rudder/util/routing"
@@ -14,14 +15,17 @@ import (
 )
 
 type Application struct {
-	E      *echo.Echo
-	DB     *database.DBConnection
-	Config *config.AppConfig
-	Args   config.Args
-	F      *services.FinancialService
-	SFIN   *services.SimpleFINService
-	AC     *services.AutocatService
-	Sched  *services.SchedService
+	E        *echo.Echo
+	DB       *database.DBConnection
+	Config   *config.AppConfig
+	Args     config.Args
+	SrvFin   *services.FinancialService
+	SrvSFIN  *services.SimpleFINService
+	SrvAc    *services.AutocatService
+	SrvSched *services.SchedService
+	HTxn     *handlers.TransactionsHandlers
+	HAcc     *handlers.AccountsHandlers
+	HAcat    *handlers.AutocatHandlers
 }
 
 func NewApplication(c *config.AppConfig, args config.Args) (*Application, error) {
@@ -32,27 +36,33 @@ func NewApplication(c *config.AppConfig, args config.Args) (*Application, error)
 		return nil, err
 	}
 
-	sfinC := clients.NewSimpleFINClient(c)
-	sfinR := repositories.NewSimpleFINRepository(db)
-	sfin := services.NewSimpleFINService(c, sfinC, sfinR)
+	clientSfin := clients.NewSimpleFINClient(c)
+	repoSfin := repositories.NewSimpleFINRepository(db)
+	srvSfin := services.NewSimpleFINService(c, clientSfin, repoSfin)
 
-	acR := repositories.NewAutocatRepository(db)
-	ac := services.NewAutocatService(acR, sfin)
+	repoAcat := repositories.NewAutocatRepository(db)
+	srvAcat := services.NewAutocatService(repoAcat, srvSfin)
+	hAcat := handlers.NewAutocatHandlers(srvAcat)
 
-	sched := services.NewSchedService(c, args, sfin)
+	repoFin := repositories.NewFinancialRepository(db)
+	srvFin := services.NewFinancialService(repoFin)
+	hTxn := handlers.NewTransactionsHandlers(srvFin)
+	hAcc := handlers.NewAccountsHandlers(srvFin)
 
-	finR := repositories.NewFinancialRepository(db)
-	fin := services.NewFinancialService(finR)
+	sched := services.NewSchedService(c, args, srvSfin)
 
 	app := &Application{
-		E:      e,
-		DB:     db,
-		Config: c,
-		Args:   args,
-		F:      fin,
-		SFIN:   sfin,
-		AC:     ac,
-		Sched:  sched,
+		E:        e,
+		DB:       db,
+		Config:   c,
+		Args:     args,
+		SrvFin:   srvFin,
+		SrvSFIN:  srvSfin,
+		SrvAc:    srvAcat,
+		SrvSched: sched,
+		HTxn:     hTxn,
+		HAcc:     hAcc,
+		HAcat:    hAcat,
 	}
 
 	return app, nil

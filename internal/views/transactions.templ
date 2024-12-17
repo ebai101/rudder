@@ -1,44 +1,134 @@
 package views
 
 import (
-    "fmt"
-    "rudder/internal/models"
-    "rudder/util/ternary"
+	"fmt"
+	"github.com/shopspring/decimal"
+	"rudder/internal/models"
+	"rudder/util/ternary"
+	"sort"
+	"time"
 )
 
-templ Transactions(txns []models.Transaction) {
-    <table class="table">
-        <thead>
-            <tr class="h-16">
-                <th>Date</th>
-                <th>Description</th>
-                <th>Category</th>
-                <th>Amount</th>
-                <th>Account</th>
-                <th>Organization</th>
-                <th>Full Description</th>
-                <th>Date Added</th>
-                <th>Date Categorized</th>
-            </tr>
-        </thead> 
-        <tbody>
-            for _, txn := range txns {
-                @TransactionRow(txn)
-            }
-        </tbody>
-    </table>
+templ AmountColorized(classes string, amt decimal.Decimal) {
+	{{
+	amtClasses := classes
+	if amt.GreaterThan(decimal.NewFromInt(1)) {
+		amtClasses = classes + " green-text"
+	} else if amt.LessThanOrEqual(decimal.NewFromInt(-100)) {
+		amtClasses = classes + " red-text"
+	}
+	}}
+	<h6 class={ amtClasses }>${ amt.StringFixed(2) }</h6>
 }
 
-templ TransactionRow(txn models.Transaction) {
-	<tr class="h-16" id={ fmt.Sprintf("row-id-%s", txn.TransactionID) }>
-		<td>{ txn.PostedDate.Format("1/2/06") }</td>
-		<td>{ txn.Description }</td>
-		<td>{ txn.Category }</td>
-		<td>{ fmt.Sprintf("$%v", txn.Amount) }</td>
-		<td>{ txn.AccountName }</td>
-		<td>{ txn.InstName }</td>
-		<td>{ txn.FullDescription }</td>
-		<td>{ txn.AddedDate.Format("1/2/06") }</td>
-		<td>{ ternary.TimeFmt(txn.CategorizedDate, "1/2/06") }</td>
-	</tr> 
+templ Transactions(txns []models.Transaction) {
+	{{ appBarParams := AppBarParams{Title: "Transactions", BackVisible: false, MoreVisible: false} }}
+	@AppBar(appBarParams)
+	<main class="responsive">
+		@TransactionsList(txns, 20)
+	</main>
+}
+
+templ TransactionsList(txns []models.Transaction, nextPage int64) {
+	{{
+	txnsByDate := make(map[string][]models.Transaction)
+	for _, txn := range txns {
+		dateKey := txn.PostedDate.Format("1/2/06")
+		txnsByDate[dateKey] = append(txnsByDate[dateKey], txn)
+	}
+
+	var uniqueDates []time.Time
+	for dateStr := range txnsByDate {
+		date, _ := time.Parse("1/2/06", dateStr)
+		uniqueDates = append(uniqueDates, date)
+	}
+
+	sort.SliceStable(uniqueDates, func(i, j int) bool {
+		return uniqueDates[i].After(uniqueDates[j])
+	})
+	}}
+	for _, date := range uniqueDates {
+		<div>
+			{{ dateKey := date.Format("1/2/06") }}
+			<h6>{ dateKey }</h6>
+			<hr class="small"/>
+		</div>
+		<div class="large-margin">
+			for _, txn := range txnsByDate[dateKey] {
+				{{ detailEndpoint := fmt.Sprintf("/transactions/detail/%d", txn.ID) }}
+				<article
+					hx-get={ detailEndpoint }
+					hx-target="main"
+					hx-replace-url="true"
+					hx-swap="outerHTML"
+					class="wave"
+				>
+					<summary class="none">
+						<nav class="row">
+							<div class="max">
+								<h6 class="small">{ txn.Description }</h6>
+								<div>{ ternary.String(txn.Category, "No Category") }</div>
+							</div>
+							@AmountColorized("medium", txn.Amount)
+						</nav>
+					</summary>
+				</article>
+			}
+		</div>
+	}
+	{{ nextPageEndpoint := fmt.Sprintf("/transactions/%d", nextPage) }}
+	<footer
+		class="transparent"
+		hx-get={ nextPageEndpoint }
+		hx-trigger="revealed"
+		hx-swap="outerHTML"
+	>
+		<progress class="circle large center"></progress>
+	</footer>
+}
+
+templ TransactionDetail(txn models.Transaction) {
+	{{ appBarParams := AppBarParams{Title: "Details", BackVisible: true, BackTarget: "/transactions", MoreVisible: false} }}
+	@AppBar(appBarParams)
+	<main class="responsive">
+		<article class="large-padding">
+			<div class="row">
+				<h6>{ txn.Description }</h6>
+				@AmountColorized("max right-align", txn.Amount)
+			</div>
+			<hr class="large"/>
+			<div class="row">
+				<b>Date</b>
+				<div class="max right-align">{ txn.PostedDate.Format("1/2/06") }</div>
+			</div>
+			<div class="row">
+				<b>Category</b>
+				<div class="max right-align">{ ternary.String(txn.Category, "Uncategorized") }</div>
+			</div>
+			<div class="row">
+				<b>Account Name</b>
+				<div class="max right-align">{ txn.AccountName }</div>
+			</div>
+			<div class="row">
+				<b>Organization</b>
+				<div class="max right-align">{ txn.InstName }</div>
+			</div>
+			<div class="row">
+				<b>Full Description</b>
+				<div class="max right-align">{ txn.FullDescription }</div>
+			</div>
+			<div class="row">
+				<b>Date Added</b>
+				<div class="max right-align">{ txn.AddedDate.Format("1/2/06") }</div>
+			</div>
+			<div class="row">
+				<b>Date Categorized</b>
+				<div class="max right-align">{ ternary.TimeFmt(txn.CategorizedDate, "1/2/06") }</div>
+			</div>
+			<div class="row">
+				<button class="transparent"><i>edit</i></button>
+				<button class="transparent"><i>group</i></button>
+			</div>
+		</article>
+	</main>
 }

@@ -1,35 +1,39 @@
 package views
 
 import (
-    "fmt"
-    "rudder/internal/models"
+	"fmt"
+	"rudder/internal/models"
 )
 
 templ Autocat(rules []models.AutocatRule) {
-    <table class="table">
-        <thead>
-            <tr class="h-16">
-                <th>Criteria</th>
-                <th>Overrides</th>
-            </tr>
-        </thead> 
-        <tbody>
-            for _, rule := range rules {
-                @AutocatRuleRow(rule)
-            }
-        </tbody>
-    </table>
+	{{ params := AppBarParams{Title: "Autocat", BackVisible: false, MoreVisible: false} }}
+	@AppBar(params)
+	<main class="responsive">
+		<table>
+			<thead>
+				<tr>
+					<th>Criteria</th>
+					<th>Overrides</th>
+				</tr>
+			</thead>
+			<tbody>
+				for _, rule := range rules {
+					@AutocatRuleRow(rule)
+				}
+			</tbody>
+		</table>
+	</main>
 }
 
 templ AutocatRuleRow(rule models.AutocatRule) {
-    for i := 0; i < max(len(rule.Criteria), len(rule.Overrides)); i++ {
-        <tr class="h-16" id={ fmt.Sprintf("row-id-%d-%d", rule.RuleID, i) }>
-            if i < len(rule.Criteria) {
-                <td>{ fmt.Sprintf("%v", rule.Criteria[i])}</td>
-            }
-            if i < len(rule.Overrides) {
-                <td>{ fmt.Sprintf("%v", rule.Overrides[i]) }</td>
-            }
-        </tr>
-    }
+	for i := 0; i < max(len(rule.Criteria), len(rule.Overrides)); i++ {
+		<tr id={ fmt.Sprintf("row-id-%d-%d", rule.RuleID, i) }>
+			if i < len(rule.Criteria) {
+				<td>{ fmt.Sprintf("%v", rule.Criteria[i]) }</td>
+			}
+			if i < len(rule.Overrides) {
+				<td>{ fmt.Sprintf("%v", rule.Overrides[i]) }</td>
+			}
+		</tr>
+	}
 }

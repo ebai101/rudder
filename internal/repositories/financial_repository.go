@@ -20,9 +20,16 @@ func NewFinancialRepository(db *database.DBConnection) *FinancialRepository {
 
 func (r *FinancialRepository) GetTransactionRows(
 	ctx context.Context,
-	limit int32,
+	params sqlc.GetTransactionRowsParams,
 ) ([]sqlc.GetTransactionRowsRow, error) {
-	return r.queries.GetTransactionRows(ctx, limit)
+	return r.queries.GetTransactionRows(ctx, params)
+}
+
+func (r *FinancialRepository) GetTransaction(
+	ctx context.Context,
+	id int64,
+) (sqlc.GetTransactionRow, error) {
+	return r.queries.GetTransaction(ctx, id)
 }
 
 func (r *FinancialRepository) GetAccountRows(

@@ -1,28 +1,32 @@
 package views
 
 import (
-    "fmt"
-    "rudder/internal/models"
+	"fmt"
+	"rudder/internal/models"
 )
 
 templ Accounts(accs []models.Account) {
-    <table class="table">
-        <thead>
-            <tr class="h-16">
-                <th>Account Name</th>
-                <th>Institution</th>
-                <th>Type</th>
-                <th>Class</th>
-                <th>Balance</th>
-                <th>Balance Date</th>
-            </tr>
-        </thead> 
-        <tbody>
-            for _, acc := range accs {
-                @AccRow(acc)
-            }
-        </tbody>
-    </table>
+	{{ params := AppBarParams{Title: "Accounts", BackVisible: false, MoreVisible: false} }}
+	@AppBar(params)
+	<main class="responsive">
+		<table>
+			<thead>
+				<tr>
+					<th>Account Name</th>
+					<th>Institution</th>
+					<th>Type</th>
+					<th>Class</th>
+					<th>Balance</th>
+					<th>Balance Date</th>
+				</tr>
+			</thead>
+			<tbody>
+				for _, acc := range accs {
+					@AccRow(acc)
+				}
+			</tbody>
+		</table>
+	</main>
 }
 
 templ AccRow(acc models.Account) {
@@ -33,5 +37,5 @@ templ AccRow(acc models.Account) {
 		<td>{ acc.AccountClass }</td>
 		<td>{ fmt.Sprintf("$%v", acc.Balance.String()) }</td>
 		<td>{ acc.BalanceDate.Format("1/2/06") }</td>
-	</tr> 
+	</tr>
 }

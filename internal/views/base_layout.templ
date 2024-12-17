@@ -2,56 +2,126 @@ package views
 
 templ Head() {
 	<head>
-		<meta charset="UTF-8"/>
-		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+		<meta charset="utf-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1"/>
+		<meta name="color-scheme" content="light dark"/>
 		<meta name="google" content="notranslate"/>
-	 	<script src="https://unpkg.com/htmx.org@2.0.3"></script>
-		<link rel="stylesheet" href="/static/css/main.css" type="text/css"/>
+		<script src="https://unpkg.com/htmx.org@2.0.3"></script>
+		<link href="https://cdn.jsdelivr.net/npm/beercss@3.7.14/dist/cdn/beer.min.css" rel="stylesheet"/>
+		<script type="module" src="https://cdn.jsdelivr.net/npm/beercss@3.7.14/dist/cdn/beer.min.js"></script>
+		<script type="module" src="https://cdn.jsdelivr.net/npm/material-dynamic-colors@1.1.2/dist/cdn/material-dynamic-colors.min.js"></script>
+		<title>Rudder</title>
 	</head>
 }
 
-templ NavBar() {
-	<div class="navbar">
-	<div class="flex-1">
-		<a hx-get="/" hx-target="#main" hx-swap="innerHTML" hx-replace-url="true" class="btn btn-ghost text-xl">Rudder</a>
-	</div>
-	<div class="flex-none">
-		<ul class="menu menu-horizontal px-1">
-		<li><a hx-get="/transactions" hx-target="#main" hx-swap="innerHTML" hx-replace-url="true">Transactions</a></li>
-		<li><a hx-get="/accounts" hx-target="#main" hx-swap="innerHTML" hx-replace-url="true">Accounts</a></li>
-		<li><a hx-get="/autocat" hx-target="#main" hx-swap="innerHTML" hx-replace-url="true">Autocat</a></li>
-		<li><a>Taxes</a></li>
-		<li><a>
-			<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-			<path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3Z" />
-			<path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6Z" />
-			</svg>
-		</a></li>
-		<li>
-		<a>
-			<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-			<path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
-			</svg>	
+type AppBarParams struct {
+	Title       string
+	BackVisible bool
+	BackTarget  string
+	MoreVisible bool
+	MoreTarget  string
+}
+
+templ AppBar(params AppBarParams) {
+	<header id="appbar" class="fixed" hx-swap-oob="outerHTML:#appbar">
+		<nav>
+			if params.BackVisible {
+				<button
+					class="circle transparent"
+					hx-get={ params.BackTarget }
+					hx-target="main"
+					hx-swap="outerHTML"
+					hx-replace-url="true"
+				>
+					<i>arrow_back</i>
+				</button>
+			}
+			<h5 class="max">{ params.Title }</h5>
+			if params.MoreVisible {
+				<button
+					class="circle transparent"
+					hx-get={ params.MoreTarget }
+				>
+					<i>more_vert</i>
+				</button>
+			}
+		</nav>
+	</header>
+}
+
+templ Nav() {
+	<nav class="left drawer l">
+		<header>
+			<h6>Rudder</h6>
+		</header>
+		<a hx-get="/" hx-target="main" hx-swap="outerHTML" hx-replace-url="true">
+			<i>home</i>
+			<div>Home</div>
 		</a>
-		</li>
-		</ul>
-	</div>
-	</div>
+		<a hx-get="/transactions" hx-target="main" hx-swap="outerHTML" hx-replace-url="true">
+			<i>payments</i>
+			<div>Transactions</div>
+		</a>
+		<a hx-get="/accounts" hx-target="main" hx-swap="outerHTML" hx-replace-url="true">
+			<i>group</i>
+			<div>Accounts</div>
+		</a>
+		<a hx-get="/autocat" hx-target="main" hx-swap="outerHTML" hx-replace-url="true">
+			<i>category</i>
+			<div>Autocat</div>
+		</a>
+	</nav>
+	<nav class="left m">
+		<header>
+			<nav>
+				<h4>R</h4>
+			</nav>
+		</header>
+		<a hx-get="/" hx-target="main" hx-swap="outerHTML" hx-replace-url="true">
+			<i>home</i>
+			<div>Home</div>
+		</a>
+		<a hx-get="/transactions" hx-target="main" hx-swap="outerHTML" hx-replace-url="true">
+			<i>payments</i>
+			<div>Txns</div>
+		</a>
+		<a hx-get="/accounts" hx-target="main" hx-swap="outerHTML" hx-replace-url="true">
+			<i>group</i>
+			<div>Accounts</div>
+		</a>
+		<a hx-get="/autocat" hx-target="main" hx-swap="outerHTML" hx-replace-url="true">
+			<i>category</i>
+			<div>Autocat</div>
+		</a>
+	</nav>
+	<nav class="bottom s">
+		<a hx-get="/" hx-target="main" hx-swap="outerHTML" hx-replace-url="true">
+			<i>home</i>
+		</a>
+		<a hx-get="/transactions" hx-target="main" hx-swap="outerHTML" hx-replace-url="true">
+			<i>payments</i>
+		</a>
+		<a hx-get="/accounts" hx-target="main" hx-swap="outerHTML" hx-replace-url="true">
+			<i>group</i>
+		</a>
+		<a hx-get="/autocat" hx-target="main" hx-swap="outerHTML" hx-replace-url="true">
+			<i>category</i>
+		</a>
+	</nav>
 }
 
 templ Body(component templ.Component) {
-	<body class="px-6 w-full h-screen flex flex-col">
-		@NavBar()
-		<div class="container mx-auto" id="main">
-			@component
-		</div>
+	<body class="dark">
+		@Nav()
+		@component
+		<div class="snackbar"></div>
 	</body>
 }
 
 templ FullPage(component templ.Component) {
 	<!DOCTYPE html>
-	<html>
-    @Head()
-    @Body(component)
+	<html lang="en">
+		@Head()
+		@Body(component)
 	</html>
 }

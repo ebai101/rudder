@@ -20,12 +20,12 @@ func main() {
 		log.Fatal(err)
 	}
 
-	handlers.RegisterRoutes(app)
+	handlers.RegisterRoutes(app.E, app.HTxn, app.HAcc, app.HAcat)
 
 	// test stuff
 	// app.Sched.Start()
-	// app.SFIN.SyncSimpleFIN(context.Background(), args.UseCached, args.SaveCached, 7)
-	// app.AC.CategorizeTransactions(context.Background())
+	// app.SrvSFIN.SyncSimpleFIN(context.Background(), args.UseCached, args.SaveCached, 7)
+	// app.SrvAc.CategorizeTransactions(context.Background())
 
 	app.E.Logger.Fatal(app.E.Start(":4040"))
 }
