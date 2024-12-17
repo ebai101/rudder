@@ -61,6 +61,14 @@ type Transaction struct {
 	CheckNum        string
 }
 
+// Insights
+type Insights struct {
+	SpentLastWeek    decimal.Decimal
+	TotalAssets      decimal.Decimal
+	TotalLiabilities decimal.Decimal
+	NetWorth         decimal.Decimal
+}
+
 func validateTimestamp(v any, param string) error {
 	val := reflect.ValueOf(v)
 

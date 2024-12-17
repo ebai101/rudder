@@ -23,6 +23,7 @@ type Application struct {
 	SrvSFIN  *services.SimpleFINService
 	SrvAc    *services.CategoriesService
 	SrvSched *services.SchedService
+	HIns     *handlers.InsightsHandlers
 	HTxn     *handlers.TransactionsHandlers
 	HAcc     *handlers.AccountsHandlers
 	HAcat    *handlers.CategoriesHandlers
@@ -48,6 +49,7 @@ func NewApplication(c *config.AppConfig, args config.Args) (*Application, error)
 	srvFin := services.NewFinancialService(repoFin)
 	hTxn := handlers.NewTransactionsHandlers(srvFin)
 	hAcc := handlers.NewAccountsHandlers(srvFin)
+	hIns := handlers.NewInsightsHandlers(srvFin)
 
 	sched := services.NewSchedService(c, args, srvSfin)
 
@@ -60,6 +62,7 @@ func NewApplication(c *config.AppConfig, args config.Args) (*Application, error)
 		SrvSFIN:  srvSfin,
 		SrvAc:    srvAcat,
 		SrvSched: sched,
+		HIns:     hIns,
 		HTxn:     hTxn,
 		HAcc:     hAcc,
 		HAcat:    hAcat,

@@ -33,3 +33,28 @@ limit $2 offset $3;
 select *
 from transactions_view tv
 where tv.id = $1;
+
+-- name: GetInsights :one
+with spent_week as (
+    select ABS(COALESCE(SUM(amount)::numeric, 0::numeric)) as spent_week
+    from transactions_view
+    where amount < 0
+        and posted_date >= current_date AT TIME ZONE 'UTC' - interval '7 days'
+),
+total_assets as (
+    select COALESCE(SUM(balance)::numeric, 0::numeric) as total_assets
+    from accounts_view
+    where account_class = 'Asset'
+),
+total_liabilities as (
+    select ABS(COALESCE(SUM(balance)::numeric, 0::numeric)) as total_liabilities
+    from accounts_view
+    where account_class = 'Liability'
+)
+select spent_week::numeric,
+    total_assets::numeric,
+    total_liabilities::numeric,
+    (total_assets - total_liabilities)::numeric as net_worth
+from spent_week
+    cross join total_assets
+    cross join total_liabilities;

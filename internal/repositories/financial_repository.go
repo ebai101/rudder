@@ -71,3 +71,7 @@ func (r *FinancialRepository) GetAccountBalances(
 ) ([]sqlc.GetAccountBalancesRow, error) {
 	return r.queries.GetAccountBalances(ctx)
 }
+
+func (r *FinancialRepository) GetInsights(ctx context.Context) (sqlc.GetInsightsRow, error) {
+	return r.queries.GetInsights(ctx)
+}

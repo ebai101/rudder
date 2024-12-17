@@ -1,9 +1,34 @@
 package views
 
-templ Index() {
+import "rudder/internal/models"
+
+templ IndexInsights(ins models.Insights) {
+	<div class="grid">
+		<article class="s3">
+			<b>Spent Past 7 Days</b>
+			<h6>${ ins.SpentLastWeek.StringFixed(2) }</h6>
+		</article>
+		<article class="s3">
+			<b>Current Assets</b>
+			<h6>${ ins.TotalAssets.StringFixed(2) }</h6>
+		</article>
+		<article class="s3">
+			<b>Current Liabilities</b>
+			<h6>${ ins.TotalLiabilities.StringFixed(2) }</h6>
+		</article>
+		<article class="s3">
+			<b>Net Worth</b>
+			<h6>${ ins.NetWorth.StringFixed(2) }</h6>
+		</article>
+	</div>
+}
+
+templ Index(ins models.Insights) {
 	{{ params := AppBarParams{Title: "Home", BackVisible: false, MoreVisible: false} }}
 	@AppBar(params)
 	<main class="responsive">
-		Hello
+		@IndexInsights(ins)
+		@Chart(createBarChart())
+		@Chart(createBarChart())
 	</main>
 }

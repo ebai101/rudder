@@ -20,7 +20,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	handlers.RegisterRoutes(app.E, app.HTxn, app.HAcc, app.HAcat)
+	handlers.RegisterRoutes(app.E, app.HIns, app.HTxn, app.HAcc, app.HAcat)
 
 	// test stuff
 	// app.Sched.Start()

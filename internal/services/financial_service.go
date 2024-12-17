@@ -175,3 +175,19 @@ func (s *FinancialService) GetAccountTransactions(
 
 	return txns, nil
 }
+
+func (s *FinancialService) GetInsights(ctx context.Context) (models.Insights, error) {
+	row, err := s.repo.GetInsights(ctx)
+	if err != nil {
+		return models.Insights{}, err
+	}
+
+	ins := models.Insights{
+		SpentLastWeek:    row.SpentWeek,
+		TotalAssets:      row.TotalAssets,
+		TotalLiabilities: row.TotalLiabilities,
+		NetWorth:         row.NetWorth,
+	}
+
+	return ins, nil
+}

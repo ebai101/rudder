@@ -20,14 +20,12 @@ func renderView(c echo.Context, component templ.Component) error {
 
 func RegisterRoutes(
 	e *echo.Echo,
+	ih *InsightsHandlers,
 	th *TransactionsHandlers,
 	ah *AccountsHandlers,
 	ch *CategoriesHandlers,
 ) {
-	e.GET("/", func(c echo.Context) error {
-		component := views.Index()
-		return renderView(c, component)
-	})
+	e.GET("/", ih.insightsHandler)
 	e.GET("/transactions", th.txnsMainHandler)
 	e.GET("/transactions/:page", th.txnsScrollHandler)
 	e.GET("/transactions/detail/:id", th.txnDetailsHandler)
