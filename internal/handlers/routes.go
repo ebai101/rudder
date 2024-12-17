@@ -22,7 +22,7 @@ func RegisterRoutes(
 	e *echo.Echo,
 	th *TransactionsHandlers,
 	ah *AccountsHandlers,
-	ach *AutocatHandlers,
+	ch *CategoriesHandlers,
 ) {
 	e.GET("/", func(c echo.Context) error {
 		component := views.Index()
@@ -32,5 +32,7 @@ func RegisterRoutes(
 	e.GET("/transactions/:page", th.txnsScrollHandler)
 	e.GET("/transactions/detail/:id", th.txnDetailsHandler)
 	e.GET("/accounts", ah.accsListHandler)
-	e.GET("/autocat", ach.acatListHandler)
+	e.GET("/accounts/:id", ah.accsDetailHandler)
+	e.GET("/accounts/navbar", ah.accsNavbarHandler)
+	e.GET("/categories", ch.acatRuleListHandler)
 }

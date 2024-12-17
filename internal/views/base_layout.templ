@@ -50,7 +50,7 @@ templ AppBar(params AppBarParams) {
 }
 
 templ Nav() {
-	<nav class="left drawer l">
+	<nav class="left drawer">
 		<header>
 			<h6>Rudder</h6>
 		</header>
@@ -59,54 +59,15 @@ templ Nav() {
 			<div>Home</div>
 		</a>
 		<a hx-get="/transactions" hx-target="main" hx-swap="outerHTML" hx-replace-url="true">
-			<i>payments</i>
-			<div>Transactions</div>
+			<i>account_balance</i>
+			<div>All Transactions</div>
 		</a>
-		<a hx-get="/accounts" hx-target="main" hx-swap="outerHTML" hx-replace-url="true">
-			<i>group</i>
-			<div>Accounts</div>
-		</a>
-		<a hx-get="/autocat" hx-target="main" hx-swap="outerHTML" hx-replace-url="true">
+		<a hx-get="/categories" hx-target="main" hx-swap="outerHTML" hx-replace-url="true">
 			<i>category</i>
-			<div>Autocat</div>
+			<div>Categories</div>
 		</a>
-	</nav>
-	<nav class="left m">
-		<header>
-			<nav>
-				<h4>R</h4>
-			</nav>
-		</header>
-		<a hx-get="/" hx-target="main" hx-swap="outerHTML" hx-replace-url="true">
-			<i>home</i>
-			<div>Home</div>
-		</a>
-		<a hx-get="/transactions" hx-target="main" hx-swap="outerHTML" hx-replace-url="true">
-			<i>payments</i>
-			<div>Txns</div>
-		</a>
-		<a hx-get="/accounts" hx-target="main" hx-swap="outerHTML" hx-replace-url="true">
-			<i>group</i>
-			<div>Accounts</div>
-		</a>
-		<a hx-get="/autocat" hx-target="main" hx-swap="outerHTML" hx-replace-url="true">
-			<i>category</i>
-			<div>Autocat</div>
-		</a>
-	</nav>
-	<nav class="bottom s">
-		<a hx-get="/" hx-target="main" hx-swap="outerHTML" hx-replace-url="true">
-			<i>home</i>
-		</a>
-		<a hx-get="/transactions" hx-target="main" hx-swap="outerHTML" hx-replace-url="true">
-			<i>payments</i>
-		</a>
-		<a hx-get="/accounts" hx-target="main" hx-swap="outerHTML" hx-replace-url="true">
-			<i>group</i>
-		</a>
-		<a hx-get="/autocat" hx-target="main" hx-swap="outerHTML" hx-replace-url="true">
-			<i>category</i>
-		</a>
+		<hr class="medium"/>
+		<div hx-get="/accounts/navbar" hx-trigger="load" hx-swap="outerHTML"></div>
 	</nav>
 }
 

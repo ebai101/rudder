@@ -6,7 +6,7 @@ import (
 )
 
 templ Autocat(rules []models.AutocatRule) {
-	{{ params := AppBarParams{Title: "Autocat", BackVisible: false, MoreVisible: false} }}
+	{{ params := AppBarParams{Title: "Categories", BackVisible: false, MoreVisible: false} }}
 	@AppBar(params)
 	<main class="responsive">
 		<table>

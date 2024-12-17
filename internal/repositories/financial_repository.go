@@ -37,3 +37,10 @@ func (r *FinancialRepository) GetAccountRows(
 ) ([]sqlc.GetAccountRowsRow, error) {
 	return r.queries.GetAccountRows(ctx)
 }
+
+func (r *FinancialRepository) GetAccount(
+	ctx context.Context,
+	id int64,
+) (sqlc.GetAccountRow, error) {
+	return r.queries.GetAccount(ctx, id)
+}

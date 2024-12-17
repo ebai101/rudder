@@ -7,19 +7,19 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type AutocatHandlers struct {
-	service *services.AutocatService
+type CategoriesHandlers struct {
+	service *services.CategoriesService
 }
 
-func NewAutocatHandlers(
-	service *services.AutocatService,
-) *AutocatHandlers {
-	return &AutocatHandlers{
+func NewCategoriesHandlers(
+	service *services.CategoriesService,
+) *CategoriesHandlers {
+	return &CategoriesHandlers{
 		service: service,
 	}
 }
 
-func (ah *AutocatHandlers) acatListHandler(c echo.Context) error {
+func (ah *CategoriesHandlers) acatRuleListHandler(c echo.Context) error {
 	c.Set("ISERROR", false)
 	ctx := c.Request().Context()
 

@@ -114,3 +114,26 @@ func (s *FinancialService) GetAccountRows(ctx context.Context) ([]models.Account
 
 	return accs, nil
 }
+
+func (s *FinancialService) GetAccount(ctx context.Context, id int64) (models.Account, error) {
+	row, err := s.repo.GetAccount(ctx, id)
+	if err != nil {
+		return models.Account{}, err
+	}
+
+	acc := models.Account{
+		ID:               row.ID,
+		AccountID:        row.AccountID,
+		AccountName:      row.AccountName,
+		InstName:         row.InstName,
+		AccountType:      string(row.AccountType.AccountTypeT),
+		AccountClass:     string(row.AccountClass.AccountClassT),
+		Currency:         row.Currency,
+		Active:           row.Active,
+		Balance:          row.Balance,
+		BalanceDate:      row.BalanceDate,
+		BalanceAddedDate: row.AddedDate,
+	}
+
+	return acc, nil
+}

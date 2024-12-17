@@ -3,6 +3,7 @@ package handlers
 import (
 	"rudder/internal/services"
 	"rudder/internal/views"
+	"strconv"
 
 	"github.com/labstack/echo/v4"
 )
@@ -19,6 +20,19 @@ func NewAccountsHandlers(
 	}
 }
 
+func (ah *AccountsHandlers) accsNavbarHandler(c echo.Context) error {
+	c.Set("ISERROR", false)
+	ctx := c.Request().Context()
+
+	accs, err := ah.service.GetAccountRows(ctx)
+	if err != nil {
+		return err
+	}
+
+	component := views.AccountsNavbar(accs)
+	return renderView(c, component)
+}
+
 func (ah *AccountsHandlers) accsListHandler(c echo.Context) error {
 	c.Set("ISERROR", false)
 	ctx := c.Request().Context()
@@ -29,5 +43,23 @@ func (ah *AccountsHandlers) accsListHandler(c echo.Context) error {
 	}
 
 	component := views.Accounts(accs)
+	return renderView(c, component)
+}
+
+func (ah *AccountsHandlers) accsDetailHandler(c echo.Context) error {
+	c.Set("ISERROR", false)
+	ctx := c.Request().Context()
+
+	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
+	if err != nil {
+		return nil
+	}
+
+	acc, err := ah.service.GetAccount(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	component := views.AccountsDetail(acc)
 	return renderView(c, component)
 }

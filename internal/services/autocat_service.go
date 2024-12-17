@@ -9,22 +9,22 @@ import (
 	"rudder/sqlc"
 )
 
-type AutocatService struct {
-	repo        *repositories.AutocatRepository
+type CategoriesService struct {
+	repo        *repositories.CategoriesRepository
 	sfinService *SimpleFINService
 }
 
-func NewAutocatService(
-	acRepo *repositories.AutocatRepository,
+func NewCategoriesService(
+	acRepo *repositories.CategoriesRepository,
 	sfinService *SimpleFINService,
-) *AutocatService {
-	return &AutocatService{
+) *CategoriesService {
+	return &CategoriesService{
 		repo:        acRepo,
 		sfinService: sfinService,
 	}
 }
 
-func (s *AutocatService) CategorizeTransactions(
+func (s *CategoriesService) CategorizeTransactions(
 	ctx context.Context,
 ) (*sqlc.UpdateTransactionCategoriesBatchResults, error) {
 	log.Printf("Categorizing transactions...")
@@ -36,7 +36,7 @@ func (s *AutocatService) CategorizeTransactions(
 	return s.repo.UpdateTransactionCategories(ctx, matches), nil
 }
 
-func (s *AutocatService) GetAutocatRules(ctx context.Context) ([]models.AutocatRule, error) {
+func (s *CategoriesService) GetAutocatRules(ctx context.Context) ([]models.AutocatRule, error) {
 	rows, err := s.repo.GetAutocatRules(ctx)
 	if err != nil {
 		return nil, err

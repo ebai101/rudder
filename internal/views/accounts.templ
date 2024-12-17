@@ -3,6 +3,7 @@ package views
 import (
 	"fmt"
 	"rudder/internal/models"
+	"rudder/util/ternary"
 )
 
 templ Accounts(accs []models.Account) {
@@ -38,4 +39,56 @@ templ AccRow(acc models.Account) {
 		<td>{ fmt.Sprintf("$%v", acc.Balance.String()) }</td>
 		<td>{ acc.BalanceDate.Format("1/2/06") }</td>
 	</tr>
+}
+
+templ AccountsNavbar(accs []models.Account) {
+	for _, acc := range accs {
+		{{ target := fmt.Sprintf("/accounts/%d", acc.ID) }}
+		<a class="truncate" hx-get={ target } hx-target="main" hx-swap="outerHTML" hx-replace-url="true">
+			<div class="small-width truncate">{ acc.AccountName }</div>
+			<div class="right">${ acc.Balance.StringFixed(2) }</div>
+		</a>
+	}
+}
+
+templ AccountsDetail(acc models.Account) {
+	{{ appBarParams := AppBarParams{Title: "Details", BackVisible: true, BackTarget: "/accounts", MoreVisible: false} }}
+	@AppBar(appBarParams)
+	<main class="responsive">
+		<article class="large-padding">
+			<div class="row">
+				<h6>{ acc.AccountName }</h6>
+				@AmountColorized("max right-align", acc.Balance)
+			</div>
+			<hr class="large"/>
+			<div class="row">
+				<b>Organization</b>
+				<div class="max right-align">{ acc.InstName }</div>
+			</div>
+			<div class="row">
+				<b>Account Class</b>
+				<div class="max right-align">{ ternary.String(acc.AccountClass, "No Class Assigned") }</div>
+			</div>
+			<div class="row">
+				<b>Account Type</b>
+				<div class="max right-align">{ ternary.String(acc.AccountType, "No Type Assigned") }</div>
+			</div>
+			<div class="row">
+				<b>Currency</b>
+				<div class="max right-align">{ acc.Currency }</div>
+			</div>
+			<div class="row">
+				<b>Balance Date</b>
+				<div class="max right-align">{ acc.BalanceDate.Format("1/2/06") }</div>
+			</div>
+			<div class="row">
+				<b>Balance Date Added</b>
+				<div class="max right-align">{ acc.BalanceAddedDate.Format("1/2/06") }</div>
+			</div>
+			<div class="row">
+				<button class="transparent"><i>edit</i></button>
+				<button class="transparent"><i>group</i></button>
+			</div>
+		</article>
+	</main>
 }

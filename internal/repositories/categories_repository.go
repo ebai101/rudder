@@ -10,19 +10,19 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-type AutocatRepository struct {
+type CategoriesRepository struct {
 	queries *sqlc.Queries
 	db      *database.DBConnection
 }
 
-func NewAutocatRepository(db *database.DBConnection) *AutocatRepository {
-	return &AutocatRepository{
+func NewCategoriesRepository(db *database.DBConnection) *CategoriesRepository {
+	return &CategoriesRepository{
 		queries: sqlc.New(db.Pool),
 		db:      db,
 	}
 }
 
-func (r *AutocatRepository) MatchTransactions(
+func (r *CategoriesRepository) MatchTransactions(
 	ctx context.Context,
 ) ([]sqlc.MatchTransactionsRow, error) {
 	matches, err := r.queries.MatchTransactions(ctx)
@@ -32,7 +32,7 @@ func (r *AutocatRepository) MatchTransactions(
 	return matches, nil
 }
 
-func (r *AutocatRepository) UpdateTransactionCategories(
+func (r *CategoriesRepository) UpdateTransactionCategories(
 	ctx context.Context,
 	matches []sqlc.MatchTransactionsRow,
 ) *sqlc.UpdateTransactionCategoriesBatchResults {
@@ -52,7 +52,7 @@ func (r *AutocatRepository) UpdateTransactionCategories(
 	return r.queries.UpdateTransactionCategories(ctx, params)
 }
 
-func (r *AutocatRepository) GetAutocatRules(
+func (r *CategoriesRepository) GetAutocatRules(
 	ctx context.Context,
 ) ([]sqlc.GetAutocatRulesRow, error) {
 	return r.queries.GetAutocatRules(ctx)

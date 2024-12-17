@@ -21,11 +21,11 @@ type Application struct {
 	Args     config.Args
 	SrvFin   *services.FinancialService
 	SrvSFIN  *services.SimpleFINService
-	SrvAc    *services.AutocatService
+	SrvAc    *services.CategoriesService
 	SrvSched *services.SchedService
 	HTxn     *handlers.TransactionsHandlers
 	HAcc     *handlers.AccountsHandlers
-	HAcat    *handlers.AutocatHandlers
+	HAcat    *handlers.CategoriesHandlers
 }
 
 func NewApplication(c *config.AppConfig, args config.Args) (*Application, error) {
@@ -40,9 +40,9 @@ func NewApplication(c *config.AppConfig, args config.Args) (*Application, error)
 	repoSfin := repositories.NewSimpleFINRepository(db)
 	srvSfin := services.NewSimpleFINService(c, clientSfin, repoSfin)
 
-	repoAcat := repositories.NewAutocatRepository(db)
-	srvAcat := services.NewAutocatService(repoAcat, srvSfin)
-	hAcat := handlers.NewAutocatHandlers(srvAcat)
+	repoAcat := repositories.NewCategoriesRepository(db)
+	srvAcat := services.NewCategoriesService(repoAcat, srvSfin)
+	hAcat := handlers.NewCategoriesHandlers(srvAcat)
 
 	repoFin := repositories.NewFinancialRepository(db)
 	srvFin := services.NewFinancialService(repoFin)
