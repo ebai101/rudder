@@ -176,17 +176,30 @@ func (s *FinancialService) GetAccountTransactions(
 	return txns, nil
 }
 
-func (s *FinancialService) GetInsights(ctx context.Context) (models.Insights, error) {
-	row, err := s.repo.GetInsights(ctx)
+func (s *FinancialService) GetInsights(
+	ctx context.Context,
+	i models.IntervalType,
+) (models.Insights, error) {
+	interval, err := models.NewIntervalPair(i)
+	if err != nil {
+		return models.Insights{}, err
+	}
+
+	row, err := s.repo.GetInsights(ctx, interval)
 	if err != nil {
 		return models.Insights{}, err
 	}
 
 	ins := models.Insights{
-		SpentLastWeek:    row.SpentWeek,
-		TotalAssets:      row.TotalAssets,
-		TotalLiabilities: row.TotalLiabilities,
-		NetWorth:         row.NetWorth,
+		CurrentAssets:      row.CurrentAssets,
+		CurrentLiabilities: row.CurrentLiabilities,
+		NetWorth:           row.NetWorth,
+		TotalIncome:        row.TotalIncome,
+		TotalExpense:       row.TotalExpense,
+		CashFlow:           row.CashFlow,
+		NeedsCatNum:        row.NeedsCatCount,
+		NeedsCatAmt:        row.NeedsCatAmt,
+		AvgDailyExpense:    interval.CalcAvgDailyExpense(row.TotalExpense),
 	}
 
 	return ins, nil

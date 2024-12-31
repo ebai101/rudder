@@ -21,12 +21,12 @@ type Application struct {
 	Args     config.Args
 	SrvFin   *services.FinancialService
 	SrvSFIN  *services.SimpleFINService
-	SrvAc    *services.CategoriesService
+	SrvCat   *services.CategoriesService
 	SrvSched *services.SchedService
 	HIns     *handlers.InsightsHandlers
 	HTxn     *handlers.TransactionsHandlers
 	HAcc     *handlers.AccountsHandlers
-	HAcat    *handlers.CategoriesHandlers
+	HCat     *handlers.CategoriesHandlers
 }
 
 func NewApplication(c *config.AppConfig, args config.Args) (*Application, error) {
@@ -41,9 +41,9 @@ func NewApplication(c *config.AppConfig, args config.Args) (*Application, error)
 	repoSfin := repositories.NewSimpleFINRepository(db)
 	srvSfin := services.NewSimpleFINService(c, clientSfin, repoSfin)
 
-	repoAcat := repositories.NewCategoriesRepository(db)
-	srvAcat := services.NewCategoriesService(repoAcat, srvSfin)
-	hAcat := handlers.NewCategoriesHandlers(srvAcat)
+	repoCat := repositories.NewCategoriesRepository(db)
+	srvCat := services.NewCategoriesService(repoCat, srvSfin)
+	hCat := handlers.NewCategoriesHandlers(srvCat)
 
 	repoFin := repositories.NewFinancialRepository(db)
 	srvFin := services.NewFinancialService(repoFin)
@@ -51,7 +51,7 @@ func NewApplication(c *config.AppConfig, args config.Args) (*Application, error)
 	hAcc := handlers.NewAccountsHandlers(srvFin)
 	hIns := handlers.NewInsightsHandlers(srvFin)
 
-	sched := services.NewSchedService(c, args, srvSfin)
+	sched := services.NewSchedService(c, args, srvSfin, srvCat)
 
 	app := &Application{
 		E:        e,
@@ -60,12 +60,12 @@ func NewApplication(c *config.AppConfig, args config.Args) (*Application, error)
 		Args:     args,
 		SrvFin:   srvFin,
 		SrvSFIN:  srvSfin,
-		SrvAc:    srvAcat,
+		SrvCat:   srvCat,
 		SrvSched: sched,
 		HIns:     hIns,
 		HTxn:     hTxn,
 		HAcc:     hAcc,
-		HAcat:    hAcat,
+		HCat:     hCat,
 	}
 
 	return app, nil

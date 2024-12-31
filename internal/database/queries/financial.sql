@@ -35,26 +35,48 @@ from transactions_view tv
 where tv.id = $1;
 
 -- name: GetInsights :one
-with spent_week as (
-    select ABS(COALESCE(SUM(amount)::numeric, 0::numeric)) as spent_week
-    from transactions_view
+with current_assets as (
+    select COALESCE(SUM(balance)::numeric, 0::numeric) as current_assets
+    from accounts_view av
+    where av.account_class = 'Asset'
+),
+current_liabilities as (
+    select ABS(COALESCE(SUM(balance)::numeric, 0::numeric)) as current_liabilities
+    from accounts_view av
+    where av.account_class = 'Liability'
+),
+total_income as (
+    select coalesce(sum(amount)::numeric, 0::numeric) as total_income
+    from transactions_view tv
+    where amount > 0
+	and tv.posted_date <= $2
+	and tv.posted_date >= $1
+),
+total_expense as (
+    select ABS(COALESCE(SUM(amount)::numeric, 0::numeric)) as total_expense
+    from transactions_view tv
     where amount < 0
-        and posted_date >= current_date AT TIME ZONE 'UTC' - interval '7 days'
+	and tv.posted_date <= $2
+	and tv.posted_date >= $1
 ),
-total_assets as (
-    select COALESCE(SUM(balance)::numeric, 0::numeric) as total_assets
-    from accounts_view
-    where account_class = 'Asset'
-),
-total_liabilities as (
-    select ABS(COALESCE(SUM(balance)::numeric, 0::numeric)) as total_liabilities
-    from accounts_view
-    where account_class = 'Liability'
+needs_cat as (
+	select
+		count(*) as needs_cat_count,
+		coalesce(sum(amount)::numeric, 0::numeric) as needs_cat_amt
+	from transactions_view
+	where category is null
 )
-select spent_week::numeric,
-    total_assets::numeric,
-    total_liabilities::numeric,
-    (total_assets - total_liabilities)::numeric as net_worth
-from spent_week
-    cross join total_assets
-    cross join total_liabilities;
+select total_income::numeric,
+	total_expense::numeric,
+	(total_income - total_expense)::numeric as cash_flow,
+    current_assets::numeric,
+    current_liabilities::numeric,
+    (current_assets - current_liabilities)::numeric as net_worth,
+    needs_cat_count,
+    needs_cat_amt::numeric
+from total_income
+	cross join total_expense
+    cross join current_assets
+    cross join current_liabilities
+	cross join needs_cat;
+

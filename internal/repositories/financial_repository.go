@@ -3,6 +3,7 @@ package repositories
 import (
 	"context"
 	"rudder/internal/database"
+	"rudder/internal/models"
 	"rudder/sqlc"
 
 	"github.com/jackc/pgx/v5/pgtype"
@@ -72,6 +73,13 @@ func (r *FinancialRepository) GetAccountBalances(
 	return r.queries.GetAccountBalances(ctx)
 }
 
-func (r *FinancialRepository) GetInsights(ctx context.Context) (sqlc.GetInsightsRow, error) {
-	return r.queries.GetInsights(ctx)
+func (r *FinancialRepository) GetInsights(
+	ctx context.Context,
+	interval models.IntervalPair,
+) (sqlc.GetInsightsRow, error) {
+	args := sqlc.GetInsightsParams{
+		PostedDate:   interval.Start,
+		PostedDate_2: interval.End,
+	}
+	return r.queries.GetInsights(ctx, args)
 }

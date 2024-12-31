@@ -63,10 +63,15 @@ type Transaction struct {
 
 // Insights
 type Insights struct {
-	SpentLastWeek    decimal.Decimal
-	TotalAssets      decimal.Decimal
-	TotalLiabilities decimal.Decimal
-	NetWorth         decimal.Decimal
+	CurrentAssets      decimal.Decimal
+	CurrentLiabilities decimal.Decimal
+	NetWorth           decimal.Decimal
+	TotalIncome        decimal.Decimal
+	TotalExpense       decimal.Decimal
+	CashFlow           decimal.Decimal
+	NeedsCatNum        int64
+	NeedsCatAmt        decimal.Decimal
+	AvgDailyExpense    decimal.Decimal
 }
 
 func validateTimestamp(v any, param string) error {

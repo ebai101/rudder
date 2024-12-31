@@ -25,11 +25,11 @@ templ Transactions(txns []models.Transaction) {
 	{{ appBarParams := AppBarParams{Title: "Transactions", BackVisible: false, MoreVisible: false} }}
 	@AppBar(appBarParams)
 	<main class="responsive">
-		@TransactionsList(txns, 20)
+		@TransactionsList(txns, "/transactions/", 20)
 	</main>
 }
 
-templ TransactionsList(txns []models.Transaction, nextPage int64) {
+templ TransactionsList(txns []models.Transaction, baseEndpoint string, nextPage int64) {
 	{{
 	txnsByDate := make(map[string][]models.Transaction)
 	for _, txn := range txns {
@@ -76,7 +76,7 @@ templ TransactionsList(txns []models.Transaction, nextPage int64) {
 			}
 		</div>
 	}
-	{{ nextPageEndpoint := fmt.Sprintf("/transactions/%d", nextPage) }}
+	{{ nextPageEndpoint := fmt.Sprintf("%s%d", baseEndpoint, nextPage) }}
 	<footer
 		class="transparent"
 		hx-get={ nextPageEndpoint }

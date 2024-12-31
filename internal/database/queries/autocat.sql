@@ -44,33 +44,7 @@ matching_transactions as (
     where (
             select bool_and(
                     COALESCE(
-                        (
-                            case
-                                when (c->>'operator')::text = 'equals'
-                                and (c->>'column_name')::text = 'description' then t.description = (c->>'filter_value_text')::text
-                                when (c->>'operator')::text = 'equals'
-                                and (c->>'column_name')::text = 'amount' then t.amount = (c->>'filter_value_numeric')::numeric
-                                when (c->>'operator')::text = 'equals'
-                                and (c->>'column_name')::text = 'posted_date' then t.posted_date = (c->>'filter_value_timestamptz')::timestamptz
-                                when (c->>'operator')::text = 'contains' then t.description like '%' || (c->>'filter_value_text')::text || '%'
-                                when (c->>'operator')::text = 'starts_with' then t.description like (c->>'filter_value_text')::text || '%'
-                                when (c->>'operator')::text = 'ends_with' then t.description like '%' || (c->>'filter_value_text')::text
-                                when (c->>'operator')::text = 'regex' then t.description ~ (c->>'filter_value_text')::text
-                                when (c->>'operator')::text = 'polarity'
-                                and (c->>'filter_value_text')::text = 'positive' then t.amount >= 0
-                                when (c->>'operator')::text = 'polarity'
-                                and (c->>'filter_value_text')::text = 'negative' then t.amount <= 0
-                                when (c->>'operator')::text = 'min'
-                                and (c->>'column_name')::text = 'amount' then t.amount >= (c->>'filter_value_numeric')::numeric
-                                when (c->>'operator')::text = 'min'
-                                and (c->>'column_name')::text = 'posted_date' then t.posted_date >= (c->>'filter_value_timestamptz')::timestamptz
-                                when (c->>'operator')::text = 'max'
-                                and (c->>'column_name')::text = 'amount' then t.amount <= (c->>'filter_value_numeric')::numeric
-                                when (c->>'operator')::text = 'max'
-                                and (c->>'column_name')::text = 'posted_date' then t.posted_date <= (c->>'filter_value_timestamptz')::timestamptz
-                                else false
-                            end
-                        ),
+                        check_transaction_criteria(t, c),
                         false
                     )
                 )

@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"rudder/internal/services"
 	"rudder/internal/views"
 	"strconv"
@@ -78,6 +79,30 @@ func (ah *AccountsHandlers) accsTransactionsHandler(c echo.Context) error {
 		return err
 	}
 
-	component := views.TransactionsList(txns, 20)
+	txnListTarget := fmt.Sprintf("/accounts/%d/transactions/", id)
+	component := views.TransactionsList(txns, txnListTarget, 20)
 	return renderView(c, component)
+}
+
+func (th *TransactionsHandlers) accsTransactionsScrollHandler(c echo.Context) error {
+	c.Set("ISERROR", false)
+	ctx := c.Request().Context()
+
+	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
+	if err != nil {
+		return nil
+	}
+
+	page, err := strconv.ParseInt(c.Param("page"), 10, 32)
+	if err != nil {
+		page = 0
+	}
+	nextPage := page + pageSize
+
+	txns, err := th.service.GetAccountTransactions(ctx, 20, int32(page), id)
+	if err != nil {
+		return err
+	}
+
+	return renderView(c, views.TransactionsList(txns, "/transactions/", nextPage))
 }

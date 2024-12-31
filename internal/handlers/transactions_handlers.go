@@ -49,7 +49,7 @@ func (th *TransactionsHandlers) txnsScrollHandler(c echo.Context) error {
 		return err
 	}
 
-	return renderView(c, views.TransactionsList(txns, nextPage))
+	return renderView(c, views.TransactionsList(txns, "/transactions/", nextPage))
 }
 
 func (th *TransactionsHandlers) txnDetailsHandler(c echo.Context) error {

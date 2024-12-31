@@ -81,7 +81,7 @@ templ AccountsDetail(acc models.Account) {
 			</div>
 		</article>
 		<div class="large-space"></div>
-		{{ txnListTarget := fmt.Sprintf("/accounts/%d/transactions", acc.ID) }}
+		{{ txnListTarget := fmt.Sprintf("/accounts/%d/transactions/0", acc.ID) }}
 		<div hx-get={ txnListTarget } hx-trigger="load" hx-swap="outerHTML"></div>
 	</main>
 }

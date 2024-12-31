@@ -27,7 +27,7 @@ func NewCategoriesService(
 func (s *CategoriesService) CategorizeTransactions(
 	ctx context.Context,
 ) (*sqlc.UpdateTransactionCategoriesBatchResults, error) {
-	log.Printf("Categorizing transactions...")
+	log.Println("Categorizing transactions...")
 	matches, err := s.repo.MatchTransactions(ctx)
 	if err != nil {
 		return nil, err

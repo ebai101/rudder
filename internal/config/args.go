@@ -3,6 +3,7 @@ package config
 import "flag"
 
 type Args struct {
+	Update      bool
 	SaveCached  bool
 	UseCached   bool
 	DaysToFetch int
@@ -10,6 +11,7 @@ type Args struct {
 }
 
 func ParseArgs() Args {
+	update := flag.Bool("update", false, "do update instead of running app")
 	saveCached := flag.Bool("saveCached", false, "save response data to JSON")
 	useCached := flag.Bool(
 		"useCached",
@@ -21,6 +23,7 @@ func ParseArgs() Args {
 	flag.Parse()
 
 	return Args{
+		Update:      *update,
 		SaveCached:  *saveCached,
 		UseCached:   *useCached,
 		DaysToFetch: *daysToFetch,

@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"rudder/internal/models"
 	"rudder/internal/services"
 	"rudder/internal/views"
 
@@ -23,7 +24,7 @@ func (ih *InsightsHandlers) insightsHandler(c echo.Context) error {
 	c.Set("ISERROR", false)
 	ctx := c.Request().Context()
 
-	ins, err := ih.service.GetInsights(ctx)
+	ins, err := ih.service.GetInsights(ctx, models.PAST_30_DAYS)
 	if err != nil {
 		return err
 	}

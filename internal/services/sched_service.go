@@ -13,6 +13,7 @@ type SchedService struct {
 	Config    *config.AppConfig
 	Args      config.Args
 	SFIN      *SimpleFINService
+	Cat       *CategoriesService
 	Scheduler gocron.Scheduler
 }
 
@@ -20,15 +21,43 @@ func NewSchedService(
 	c *config.AppConfig,
 	a config.Args,
 	sfin *SimpleFINService,
+	cat *CategoriesService,
 ) *SchedService {
 	return &SchedService{
 		Config: c,
 		Args:   a,
 		SFIN:   sfin,
+		Cat:    cat,
 	}
 }
 
-func (s *SchedService) makeJob(
+// Default options for job names
+func withName(name string) gocron.JobOption {
+	return gocron.WithName(name)
+}
+
+// Default options for event listeners
+func withEventListeners(s *SchedService) gocron.JobOption {
+	return gocron.WithEventListeners(
+		gocron.BeforeJobRuns(func(jobID uuid.UUID, jobName string) {
+			log.Printf("Running %v job...", jobName)
+		}),
+		gocron.AfterJobRuns(func(jobID uuid.UUID, jobName string) {
+			log.Printf("Finished running %v job", jobName)
+
+			// Run autocat job after sync job
+			s.Cat.CategorizeTransactions(context.Background())
+		}),
+		gocron.AfterJobRunsWithError(func(jobID uuid.UUID, jobName string, err error) {
+			log.Printf("Error while running %v job: %v\n", jobName, err)
+		}),
+		gocron.AfterJobRunsWithPanic(func(jobID uuid.UUID, jobName string, recoverData any) {
+			log.Printf("Panic while running %v job: %v\n", jobName, recoverData)
+		}),
+	)
+}
+
+func (s *SchedService) makeSyncJob(
 	sched gocron.Scheduler,
 	crontab string,
 	name string,
@@ -43,22 +72,10 @@ func (s *SchedService) makeJob(
 			s.Args.SaveCached,
 			days,
 		),
-		gocron.WithName(name),
-		gocron.WithEventListeners(
-			gocron.BeforeJobRuns(func(jobID uuid.UUID, jobName string) {
-				log.Printf("Running %v job...", jobName)
-			}),
-			gocron.AfterJobRuns(func(jobID uuid.UUID, jobName string) {
-				log.Printf("Finished running %v job", jobName)
-			}),
-			gocron.AfterJobRunsWithError(func(jobID uuid.UUID, jobName string, err error) {
-				log.Printf("Error while running %v job: %v\n", jobName, err)
-			}),
-			gocron.AfterJobRunsWithPanic(func(jobID uuid.UUID, jobName string, recoverData any) {
-				log.Printf("Panic while running %v job: %v\n", jobName, recoverData)
-			}),
-		),
+		withName(name),
+		withEventListeners(s),
 	)
+
 	return err
 }
 
@@ -69,9 +86,9 @@ func (s *SchedService) Start() error {
 	}
 	s.Scheduler = sched
 
-	s.makeJob(s.Scheduler, "* * * * *", "hourly", s.Config.HourlyPullDays)
-	s.makeJob(s.Scheduler, "0 5 * * *", "daily", s.Config.DailyPullDays)
-	s.makeJob(s.Scheduler, "0 6 * * 6", "weekly", s.Config.WeeklyPullDays)
+	s.makeSyncJob(s.Scheduler, "0 * * * *", "hourly", s.Config.HourlyPullDays)
+	s.makeSyncJob(s.Scheduler, "0 5 * * *", "daily", s.Config.DailyPullDays)
+	s.makeSyncJob(s.Scheduler, "0 6 * * 6", "weekly", s.Config.WeeklyPullDays)
 
 	s.Scheduler.Start()
 	for _, job := range sched.Jobs() {

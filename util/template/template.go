@@ -5,6 +5,8 @@ import (
 	"errors"
 	"io"
 
+	"github.com/shopspring/decimal"
+
 	"github.com/a-h/templ"
 	"github.com/labstack/echo/v4"
 )
@@ -40,4 +42,8 @@ func ChartComponent(chart Renderable) templ.Component {
 	return templ.ComponentFunc(func(ctx context.Context, w io.Writer) error {
 		return chart.Render(w)
 	})
+}
+
+func Money(d decimal.Decimal) string {
+	return "$" + d.StringFixed(2)
 }

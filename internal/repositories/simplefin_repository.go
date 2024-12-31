@@ -35,6 +35,7 @@ func (r *SimpleFINRepository) InsertAccounts(
 			Currency:    acc.Currency,
 		})
 	}
+
 	return r.queries.InsertAccounts(context.Background(), params)
 }
 
@@ -70,6 +71,7 @@ func (r *SimpleFINRepository) InsertBalances(
 			AccountID:   acc.AccountId,
 		})
 	}
+
 	return r.queries.InsertBalances(context.Background(), params)
 }
 

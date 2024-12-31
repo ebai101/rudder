@@ -60,6 +60,8 @@ func (s *SimpleFINService) InsertTransactions(
 	return s.repo.InsertTransactions(ctx, accs)
 }
 
+// SyncSimpleFIN fetches SimpleFIN data and inserts it into the database.
+// This function is run periodically by the scheduler.
 func (s *SimpleFINService) SyncSimpleFIN(
 	ctx context.Context,
 	useCached bool,

@@ -1,24 +1,70 @@
 package views
 
-import "rudder/internal/models"
+import (
+	"fmt"
+	"rudder/internal/models"
+	"rudder/util/template"
+)
+
+templ IndexInsightsHeader(ins models.Insights) {
+	<div class="grid">
+		<article class="s4">
+			<b>Current Assets</b>
+			<h6>{ template.Money(ins.CurrentAssets) }</h6>
+		</article>
+		<article class="s4">
+			<b>Current Liabilities</b>
+			<h6>{ template.Money(ins.CurrentLiabilities) }</h6>
+		</article>
+		<article class="s4">
+			<b>Net Worth</b>
+			<h6>{ template.Money(ins.NetWorth) }</h6>
+		</article>
+		<div class="s3 field label suffix border">
+			<select hx-target="#results-container" hx-indicator="#loading-spinner">
+				<option value="30d" selected>Past 30 days</option>
+				<option value="week">This week</option>
+				<option value="month">This month</option>
+				<option value="quarter">This quarter</option>
+				<option value="year">This year</option>
+				<option value="12m">Last 12 months</option>
+				<option value="last-week">Last week</option>
+				<option value="last-month">Last month</option>
+				<option value="last-quarter">Last quarter</option>
+				<option value="last-year">Last year</option>
+			</select>
+			<label>Insights</label>
+			<i>arrow_drop_down</i>
+		</div>
+		<hr class="s9 middle-align center-align large"/>
+	</div>
+}
 
 templ IndexInsights(ins models.Insights) {
 	<div class="grid">
-		<article class="s3">
-			<b>Spent Past 7 Days</b>
-			<h6>${ ins.SpentLastWeek.StringFixed(2) }</h6>
+		<article class="s2">
+			<b>Total Income</b>
+			<h6>{ template.Money(ins.TotalIncome) }</h6>
 		</article>
-		<article class="s3">
-			<b>Current Assets</b>
-			<h6>${ ins.TotalAssets.StringFixed(2) }</h6>
+		<article class="s2">
+			<b>Total Expense</b>
+			<h6>{ template.Money(ins.TotalExpense) }</h6>
 		</article>
-		<article class="s3">
-			<b>Current Liabilities</b>
-			<h6>${ ins.TotalLiabilities.StringFixed(2) }</h6>
+		<article class="s2">
+			<b>Cash Flow</b>
+			<h6>{ template.Money(ins.CashFlow) }</h6>
 		</article>
-		<article class="s3">
-			<b>Net Worth</b>
-			<h6>${ ins.NetWorth.StringFixed(2) }</h6>
+		<article class="s2">
+			<b># Uncategorized</b>
+			<h6>{ fmt.Sprintf("%d", ins.NeedsCatNum) }</h6>
+		</article>
+		<article class="s2">
+			<b>$ Uncategorized</b>
+			<h6>{ template.Money(ins.NeedsCatAmt) }</h6>
+		</article>
+		<article class="s2">
+			<b>Avg. Daily Expense</b>
+			<h6>{ template.Money(ins.AvgDailyExpense) }</h6>
 		</article>
 	</div>
 }
@@ -27,8 +73,9 @@ templ Index(ins models.Insights) {
 	{{ params := AppBarParams{Title: "Home", BackVisible: false, MoreVisible: false} }}
 	@AppBar(params)
 	<main class="responsive">
+		@IndexInsightsHeader(ins)
 		@IndexInsights(ins)
-		@Chart(createBarChart())
-		@Chart(createBarChart())
+		// @Chart(createBarChart())
+		// @Chart(createBarChart())
 	</main>
 }
