@@ -83,3 +83,9 @@ func (r *FinancialRepository) GetInsights(
 	}
 	return r.queries.GetInsights(ctx, args)
 }
+
+func (r *FinancialRepository) GetInsightsChartData(
+	ctx context.Context,
+) ([]sqlc.GetInsightChartDataRow, error) {
+	return r.queries.GetInsightChartData(ctx)
+}

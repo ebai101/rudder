@@ -2,39 +2,53 @@ package views
 
 import (
 	"context"
+	"fmt"
 	"github.com/go-echarts/go-echarts/v2/charts"
 	"github.com/go-echarts/go-echarts/v2/opts"
-	"golang.org/x/exp/rand"
+	"github.com/go-echarts/go-echarts/v2/types"
 	"io"
+	"math"
+	"rudder/internal/models"
+	"rudder/util/template"
 )
 
-func generateBarItems() []opts.BarData {
-	items := make([]opts.BarData, 0)
-	for i := 0; i < 7; i++ {
-		items = append(items, opts.BarData{Value: rand.Intn(300)})
-	}
-	return items
-}
-
-func createBarChart() *charts.Bar {
+func createInsightsChart(data []models.InsightsChartData, catType string) *charts.Bar {
 	bar := charts.NewBar()
-	bar.SetGlobalOptions(charts.WithTitleOpts(opts.Title{
-		Title: "Bar chart",
-	}),
-		charts.WithInitializationOpts(opts.Initialization{Width: "100%", Theme: "dark"}))
-	bar.SetXAxis([]string{"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"}).
-		AddSeries("Category A", generateBarItems()).
-		AddSeries("Category B", generateBarItems())
-	return bar
-}
+	bar.Renderer = template.NewChartRender(bar, bar.Validate)
 
-func createPieChart() *charts.Pie {
-	pie := charts.NewPie()
-	pie.SetGlobalOptions(charts.WithTitleOpts(opts.Title{
-		Title: "Pie chart",
-	}),
-		charts.WithInitializationOpts(opts.Initialization{Width: "100%", Theme: "dark"}))
-	return pie
+	xAxis := make([]string, 0)
+	yAxis := make([]opts.BarData, 0)
+	for _, v := range data {
+		if v.CategoryType == catType {
+			xAxis = append(xAxis, v.Category)
+			yAxis = append(yAxis, opts.BarData{Value: math.Abs(float64(v.TotalAmount.IntPart()))})
+		}
+	}
+	bar.SetXAxis(xAxis).AddSeries("Vals", yAxis)
+
+	initOpts := opts.Initialization{
+		Width:           "100%",
+		Height:          fmt.Sprintf("%dem", len(xAxis)*2),
+		Theme:           types.ThemeChalk,
+		BackgroundColor: "transparent",
+	}
+	legendOpts := opts.Legend{
+		Show: opts.Bool(false),
+	}
+	gridOpts := opts.Grid{
+		Right:  "0",
+		Top:    "0",
+		Bottom: "0",
+	}
+
+	bar.SetGlobalOptions(
+		charts.WithInitializationOpts(initOpts),
+		charts.WithLegendOpts(legendOpts),
+		charts.WithGridOpts(gridOpts),
+	)
+	bar.XYReversal()
+
+	return bar
 }
 
 type Renderable interface {
@@ -48,7 +62,7 @@ func ConvertChart(chart Renderable) templ.Component {
 }
 
 templ Chart(chart Renderable) {
-	<article class="chart">
+	<div class="chart">
 		@ConvertChart(chart)
-	</article>
+	</div>
 }

@@ -74,6 +74,12 @@ type Insights struct {
 	AvgDailyExpense    decimal.Decimal
 }
 
+type InsightsChartData struct {
+	Category     string
+	TotalAmount  decimal.Decimal
+	CategoryType string
+}
+
 func validateTimestamp(v any, param string) error {
 	val := reflect.ValueOf(v)
 

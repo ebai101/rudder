@@ -20,6 +20,7 @@ templ IndexInsightsHeader(ins models.Insights) {
 			<b>Net Worth</b>
 			<h6>{ template.Money(ins.NetWorth) }</h6>
 		</article>
+		<div class="s12 medium-space"></div>
 		<div class="s3 field label suffix border">
 			<select hx-target="#results-container" hx-indicator="#loading-spinner">
 				<option value="30d" selected>Past 30 days</option>
@@ -55,27 +56,33 @@ templ IndexInsights(ins models.Insights) {
 			<h6>{ template.Money(ins.CashFlow) }</h6>
 		</article>
 		<article class="s2">
-			<b># Uncategorized</b>
-			<h6>{ fmt.Sprintf("%d", ins.NeedsCatNum) }</h6>
+			<b>Avg. Daily Expense</b>
+			<h6>{ template.Money(ins.AvgDailyExpense) }</h6>
 		</article>
 		<article class="s2">
 			<b>$ Uncategorized</b>
 			<h6>{ template.Money(ins.NeedsCatAmt) }</h6>
 		</article>
 		<article class="s2">
-			<b>Avg. Daily Expense</b>
-			<h6>{ template.Money(ins.AvgDailyExpense) }</h6>
+			<b># Uncategorized</b>
+			<h6>{ fmt.Sprintf("%d", ins.NeedsCatNum) }</h6>
 		</article>
 	</div>
 }
 
-templ Index(ins models.Insights) {
+templ InsightsCharts(data []models.InsightsChartData) {
+	<b>Income & Expenses Breakdown</b>
+	@Chart(createInsightsChart(data, "Expense"))
+	@Chart(createInsightsChart(data, "Income"))
+}
+
+templ Index(ins models.Insights, chartData []models.InsightsChartData) {
 	{{ params := AppBarParams{Title: "Home", BackVisible: false, MoreVisible: false} }}
 	@AppBar(params)
 	<main class="responsive">
 		@IndexInsightsHeader(ins)
 		@IndexInsights(ins)
-		// @Chart(createBarChart())
-		// @Chart(createBarChart())
+		<div class="space"></div>
+		@InsightsCharts(chartData)
 	</main>
 }

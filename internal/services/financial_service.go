@@ -204,3 +204,23 @@ func (s *FinancialService) GetInsights(
 
 	return ins, nil
 }
+
+func (s *FinancialService) GetInsightsChartData(
+	ctx context.Context,
+) ([]models.InsightsChartData, error) {
+	rows, err := s.repo.GetInsightsChartData(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	data := make([]models.InsightsChartData, len(rows))
+	for i, r := range rows {
+		data[i] = models.InsightsChartData{
+			Category:     r.Category.String,
+			TotalAmount:  r.TotalAmount,
+			CategoryType: r.CategoryType,
+		}
+	}
+
+	return data, nil
+}

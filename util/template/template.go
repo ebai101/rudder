@@ -1,7 +1,6 @@
 package template
 
 import (
-	"context"
 	"errors"
 	"io"
 
@@ -36,12 +35,6 @@ func newTemplate() echo.Renderer {
 
 func AssertRender(c echo.Context, statusCode int, component templ.Component) error {
 	return c.Render(statusCode, "", component)
-}
-
-func ChartComponent(chart Renderable) templ.Component {
-	return templ.ComponentFunc(func(ctx context.Context, w io.Writer) error {
-		return chart.Render(w)
-	})
 }
 
 func Money(d decimal.Decimal) string {

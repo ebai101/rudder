@@ -2,6 +2,7 @@ package models
 
 import (
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/shopspring/decimal"
@@ -33,10 +34,12 @@ func NewIntervalPair(i IntervalType) (IntervalPair, error) {
 	switch i {
 	case PAST_30_DAYS:
 		start := today.Add(-1 * 30 * 24 * time.Hour)
-		return IntervalPair{
+		pair := IntervalPair{
 			Start: start,
 			End:   today,
-		}, nil
+		}
+		fmt.Println(pair)
+		return pair, nil
 	}
 
 	return IntervalPair{}, errors.New("could not create IntervalPair")

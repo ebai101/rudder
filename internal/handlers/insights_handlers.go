@@ -29,6 +29,11 @@ func (ih *InsightsHandlers) insightsHandler(c echo.Context) error {
 		return err
 	}
 
-	component := views.Index(ins)
+	chartData, err := ih.service.GetInsightsChartData(ctx)
+	if err != nil {
+		return err
+	}
+
+	component := views.Index(ins, chartData)
 	return renderView(c, component)
 }
