@@ -74,7 +74,7 @@ func (ah *AccountsHandlers) accsTransactionsHandler(c echo.Context) error {
 		return nil
 	}
 
-	txns, err := ah.service.GetAccountTransactions(ctx, 20, 0, id)
+	txns, err := ah.service.GetAccountTransactions(ctx, 21, 0, id)
 	if err != nil {
 		return err
 	}
@@ -84,7 +84,7 @@ func (ah *AccountsHandlers) accsTransactionsHandler(c echo.Context) error {
 	return renderView(c, component)
 }
 
-func (th *TransactionsHandlers) accsTransactionsScrollHandler(c echo.Context) error {
+func (ah *AccountsHandlers) accsTransactionsScrollHandler(c echo.Context) error {
 	c.Set("ISERROR", false)
 	ctx := c.Request().Context()
 
@@ -99,10 +99,12 @@ func (th *TransactionsHandlers) accsTransactionsScrollHandler(c echo.Context) er
 	}
 	nextPage := page + pageSize
 
-	txns, err := th.service.GetAccountTransactions(ctx, 20, int32(page), id)
+	txns, err := ah.service.GetAccountTransactions(ctx, 21, int32(page), id)
 	if err != nil {
 		return err
 	}
 
-	return renderView(c, views.TransactionsList(txns, "/transactions/", nextPage))
+	txnListTarget := fmt.Sprintf("/accounts/%d/transactions/", id)
+	component := views.TransactionsList(txns, txnListTarget, nextPage)
+	return renderView(c, component)
 }

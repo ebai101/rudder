@@ -6,7 +6,8 @@ from accounts_view av;
 select av.id,
     av.account_name,
     av.balance
-from accounts_view av;
+from accounts_view av
+where av.active;
 
 -- name: GetAccount :one
 select *

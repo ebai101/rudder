@@ -1,6 +1,9 @@
 .PHONY: default
 default: live ;
 
+live/db:
+	cd db && docker compose up --remove-orphans
+
 live/templ:
 	templ generate --watch --proxy="http://localhost:4040" --open-browser=false
 
@@ -17,4 +20,4 @@ live:
 	make -j4 live/templ live/server live/sync_assets live/sync_sqlc
 
 sync:
-	go run cmd/server/main.go -update
+	go run cmd/server/main.go -update $(ARGS)

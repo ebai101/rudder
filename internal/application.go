@@ -73,7 +73,9 @@ func NewApplication(c *config.AppConfig, args config.Args) (*Application, error)
 
 func bootstrapEcho() *echo.Echo {
 	e := echo.New()
-	e.Use(middleware.Logger())
+	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
+		Format: "method=${method}, uri=${uri}, status=${status}\n",
+	}))
 
 	routing.SetupRouter(e)
 	template.NewTemplateRenderer(e)

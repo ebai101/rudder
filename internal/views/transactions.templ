@@ -31,6 +31,10 @@ templ Transactions(txns []models.Transaction) {
 
 templ TransactionsList(txns []models.Transaction, baseEndpoint string, nextPage int64) {
 	{{
+	hasNextPage := len(txns) == 21
+	if hasNextPage {
+		txns = txns[0:20]
+	}
 	txnsByDate := make(map[string][]models.Transaction)
 	for _, txn := range txns {
 		dateKey := txn.PostedDate.Format("1/2/06")
@@ -76,15 +80,19 @@ templ TransactionsList(txns []models.Transaction, baseEndpoint string, nextPage 
 			}
 		</div>
 	}
-	{{ nextPageEndpoint := fmt.Sprintf("%s%d", baseEndpoint, nextPage) }}
-	<footer
-		class="transparent"
-		hx-get={ nextPageEndpoint }
-		hx-trigger="revealed"
-		hx-swap="outerHTML"
-	>
-		<progress class="circle large center"></progress>
-	</footer>
+	if hasNextPage {
+		{{ nextPageEndpoint := fmt.Sprintf("%s%d", baseEndpoint, nextPage) }}
+		<footer
+			class="transparent"
+			hx-get={ nextPageEndpoint }
+			hx-trigger="revealed"
+			hx-swap="outerHTML"
+		>
+			<progress class="circle large center"></progress>
+		</footer>
+	} else {
+		<footer class="center-align transparent">No more transactions to display</footer>
+	}
 }
 
 templ TransactionDetail(txn models.Transaction) {

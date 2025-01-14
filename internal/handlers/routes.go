@@ -33,7 +33,7 @@ func RegisterRoutes(
 	e.GET("/accounts", ah.accsListHandler)
 	e.GET("/accounts/:id", ah.accsDetailHandler)
 	e.GET("/accounts/:id/transactions", ah.accsTransactionsHandler)
-	e.GET("/accounts/:id/transactions/:page", ah.accsTransactionsHandler)
+	e.GET("/accounts/:id/transactions/:page", ah.accsTransactionsScrollHandler)
 	e.GET("/accounts/navbar", ah.accsNavbarHandler)
 	e.GET("/categories", ch.acatRuleListHandler)
 }

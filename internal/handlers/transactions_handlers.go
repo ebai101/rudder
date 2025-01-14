@@ -8,7 +8,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-const pageSize = 20
+const pageSize int64 = 20
 
 type TransactionsHandlers struct {
 	service *services.FinancialService
@@ -26,7 +26,7 @@ func (th *TransactionsHandlers) txnsMainHandler(c echo.Context) error {
 	c.Set("ISERROR", false)
 	ctx := c.Request().Context()
 
-	txns, err := th.service.GetTransactionRows(ctx, 20, 0, "")
+	txns, err := th.service.GetTransactionRows(ctx, 21, 0, "")
 	if err != nil {
 		return err
 	}
@@ -44,7 +44,7 @@ func (th *TransactionsHandlers) txnsScrollHandler(c echo.Context) error {
 	}
 	nextPage := page + pageSize
 
-	txns, err := th.service.GetTransactionRows(ctx, 20, int32(page), "")
+	txns, err := th.service.GetTransactionRows(ctx, 21, int32(page), "")
 	if err != nil {
 		return err
 	}
