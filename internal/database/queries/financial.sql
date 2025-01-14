@@ -51,12 +51,14 @@ total_income as (
     from transactions_view tv
     where amount > 0
 	and tv.posted_date between $1 and $2
+	and tv.category not ilike 'Transfer'
 ),
 total_expense as (
     select ABS(COALESCE(SUM(amount)::numeric, 0::numeric)) as total_expense
     from transactions_view tv
     where amount < 0
 	and tv.posted_date between $1 and $2
+	and tv.category not ilike 'Transfer'
 ),
 needs_cat as (
 	select
