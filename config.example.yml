@@ -1,0 +1,23 @@
+# your timezone
+timezone: America/New_York
+
+# token from simplefin bridge
+# https://beta-bridge.simplefin.org/my-account/tokens/create
+sfin_bridge_token: tokentokentoken
+
+# full url to the database
+db_url: postgres://uname:pword@localhost:5432/postgres
+
+# number of days to pull for each scheduled task type
+setup_pull_days: 180
+weekly_pull_days: 30
+daily_pull_days: 7
+hourly_pull_days: 3
+
+# whether to send requests to simplefin or use cached data
+# useful for debugging
+send_requests: true
+
+# whether to save a copy of the simplefin response locally
+save_cache: true
+
