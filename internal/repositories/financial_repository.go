@@ -86,6 +86,11 @@ func (r *FinancialRepository) GetInsights(
 
 func (r *FinancialRepository) GetInsightsChartData(
 	ctx context.Context,
+	interval models.IntervalPair,
 ) ([]sqlc.GetInsightChartDataRow, error) {
-	return r.queries.GetInsightChartData(ctx)
+	args := sqlc.GetInsightChartDataParams{
+		PostedDate:   interval.Start,
+		PostedDate_2: interval.End,
+	}
+	return r.queries.GetInsightChartData(ctx, args)
 }

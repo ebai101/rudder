@@ -26,6 +26,7 @@ func RegisterRoutes(
 	ch *CategoriesHandlers,
 ) {
 	e.GET("/", ih.insightsHandler)
+	e.GET("/insights", ih.insightsPeriodHandler)
 	e.GET("/transactions", th.txnsMainHandler)
 	e.GET("/transactions/:page", th.txnsScrollHandler)
 	e.GET("/transactions/detail/:id", th.txnDetailsHandler)

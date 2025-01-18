@@ -207,8 +207,14 @@ func (s *FinancialService) GetInsights(
 
 func (s *FinancialService) GetInsightsChartData(
 	ctx context.Context,
+	i models.IntervalType,
 ) ([]models.InsightsChartData, error) {
-	rows, err := s.repo.GetInsightsChartData(ctx)
+	interval, err := models.NewIntervalPair(i)
+	if err != nil {
+		return nil, err
+	}
+
+	rows, err := s.repo.GetInsightsChartData(ctx, interval)
 	if err != nil {
 		return nil, err
 	}

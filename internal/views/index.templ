@@ -20,9 +20,8 @@ templ IndexInsightsHeader(ins models.Insights) {
 			<b>Net Worth</b>
 			<h6>{ template.Money(ins.NetWorth) }</h6>
 		</article>
-		<div class="s12 medium-space"></div>
 		<div class="s3 field label suffix border">
-			<select hx-target="#results-container" hx-indicator="#loading-spinner">
+			<select name="period" hx-get="/insights/" hx-target="#insights-container" hx-swap="outerHTML">
 				<option value="30d" selected>Past 30 days</option>
 				<option value="week">This week</option>
 				<option value="month">This month</option>
@@ -41,32 +40,36 @@ templ IndexInsightsHeader(ins models.Insights) {
 	</div>
 }
 
-templ IndexInsights(ins models.Insights) {
-	<div class="grid">
-		<article class="s2">
-			<b>Total Income</b>
-			<h6>{ template.Money(ins.TotalIncome) }</h6>
-		</article>
-		<article class="s2">
-			<b>Total Expense</b>
-			<h6>{ template.Money(ins.TotalExpense) }</h6>
-		</article>
-		<article class="s2">
-			<b>Cash Flow</b>
-			<h6>{ template.Money(ins.CashFlow) }</h6>
-		</article>
-		<article class="s2">
-			<b>Avg. Daily Expense</b>
-			<h6>{ template.Money(ins.AvgDailyExpense) }</h6>
-		</article>
-		<article class="s2">
-			<b>$ Uncategorized</b>
-			<h6>{ template.Money(ins.NeedsCatAmt) }</h6>
-		</article>
-		<article class="s2">
-			<b># Uncategorized</b>
-			<h6>{ fmt.Sprintf("%d", ins.NeedsCatNum) }</h6>
-		</article>
+templ IndexInsights(ins models.Insights, chartData []models.InsightsChartData) {
+	<div id="insights-container">
+		<div class="grid">
+			<article class="s2">
+				<b>Total Income</b>
+				<h6>{ template.Money(ins.TotalIncome) }</h6>
+			</article>
+			<article class="s2">
+				<b>Total Expense</b>
+				<h6>{ template.Money(ins.TotalExpense) }</h6>
+			</article>
+			<article class="s2">
+				<b>Cash Flow</b>
+				<h6>{ template.Money(ins.CashFlow) }</h6>
+			</article>
+			<article class="s2">
+				<b>Avg. Daily Expense</b>
+				<h6>{ template.Money(ins.AvgDailyExpense) }</h6>
+			</article>
+			<article class="s2">
+				<b>$ Uncategorized</b>
+				<h6>{ template.Money(ins.NeedsCatAmt) }</h6>
+			</article>
+			<article class="s2">
+				<b># Uncategorized</b>
+				<h6>{ fmt.Sprintf("%d", ins.NeedsCatNum) }</h6>
+			</article>
+		</div>
+		<div class="medium-space"></div>
+		@InsightsCharts(chartData)
 	</div>
 }
 
@@ -81,8 +84,7 @@ templ Index(ins models.Insights, chartData []models.InsightsChartData) {
 	@AppBar(params)
 	<main class="responsive">
 		@IndexInsightsHeader(ins)
-		@IndexInsights(ins)
-		<div class="space"></div>
-		@InsightsCharts(chartData)
+		<div class="medium-space"></div>
+		@IndexInsights(ins, chartData)
 	</main>
 }

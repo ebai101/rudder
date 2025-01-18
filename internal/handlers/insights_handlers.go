@@ -29,11 +29,31 @@ func (ih *InsightsHandlers) insightsHandler(c echo.Context) error {
 		return err
 	}
 
-	chartData, err := ih.service.GetInsightsChartData(ctx)
+	chartData, err := ih.service.GetInsightsChartData(ctx, models.PAST_30_DAYS)
 	if err != nil {
 		return err
 	}
 
 	component := views.Index(ins, chartData)
+	return renderView(c, component)
+}
+
+func (ih *InsightsHandlers) insightsPeriodHandler(c echo.Context) error {
+	c.Set("ISERROR", false)
+	ctx := c.Request().Context()
+
+	period := models.IntervalType(c.QueryParam("period"))
+
+	ins, err := ih.service.GetInsights(ctx, period)
+	if err != nil {
+		return err
+	}
+
+	chartData, err := ih.service.GetInsightsChartData(ctx, period)
+	if err != nil {
+		return err
+	}
+
+	component := views.IndexInsights(ins, chartData)
 	return renderView(c, component)
 }

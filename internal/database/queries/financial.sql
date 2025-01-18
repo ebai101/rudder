@@ -88,5 +88,5 @@ select
 	c.category_type 
 from transactions t
 inner join categories c on t.category = c.category and c.hide_from_reports = false
-where t.posted_date between current_date - interval '30 days' and current_date
+where t.posted_date between $1 and $2
 group by t.category, c.category_type;
