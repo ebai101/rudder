@@ -55,23 +55,27 @@ templ AppBar(params AppBarParams) {
 	</header>
 }
 
+templ navLink(url string, icon string, title string) {
+	<a
+		hx-get={ url }
+		hx-target="main"
+		hx-swap="outerHTML"
+		hx-replace-url="true"
+		hx-push-url="true"
+	>
+		<i>{ icon }</i>
+		<div>{ title }</div>
+	</a>
+}
+
 templ Nav() {
 	<nav class="left drawer">
 		<header>
 			<h6>Rudder</h6>
 		</header>
-		<a hx-get="/" hx-target="main" hx-swap="outerHTML" hx-replace-url="true">
-			<i>home</i>
-			<div>Home</div>
-		</a>
-		<a hx-get="/transactions" hx-target="main" hx-swap="outerHTML" hx-replace-url="true">
-			<i>account_balance</i>
-			<div>All Transactions</div>
-		</a>
-		<a hx-get="/categories" hx-target="main" hx-swap="outerHTML" hx-replace-url="true">
-			<i>category</i>
-			<div>Categories</div>
-		</a>
+		@navLink("/", "home", "Home")
+		@navLink("/transactions", "account_balance", "All Transactions")
+		@navLink("/categories", "category", "Categories")
 		<hr class="medium"/>
 		<div hx-get="/accounts/navbar" hx-trigger="load" hx-swap="outerHTML"></div>
 	</nav>
