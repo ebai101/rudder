@@ -45,43 +45,59 @@ templ AccountsDetail(acc models.Account) {
 	{{ appBarParams := AppBarParams{Title: "Details", BackVisible: true, BackTarget: "/accounts", MoreVisible: false} }}
 	@AppBar(appBarParams)
 	<main class="responsive">
-		<article class="large-padding">
-			<div class="row">
-				<h6>{ acc.AccountName }</h6>
-				@AmountColorized("max right-align", acc.Balance)
-			</div>
-			<hr class="large"/>
-			<div class="row">
-				<b>Organization</b>
-				<div class="max right-align">{ acc.InstName }</div>
-			</div>
-			<div class="row">
-				<b>Account Class</b>
-				<div class="max right-align">{ ternary.String(acc.AccountClass, "No Class Assigned") }</div>
-			</div>
-			<div class="row">
-				<b>Account Type</b>
-				<div class="max right-align">{ ternary.String(acc.AccountType, "No Type Assigned") }</div>
-			</div>
-			<div class="row">
-				<b>Currency</b>
-				<div class="max right-align">{ acc.Currency }</div>
-			</div>
-			<div class="row">
-				<b>Balance Date</b>
-				<div class="max right-align">{ acc.BalanceDate.Format("1/2/06") }</div>
-			</div>
-			<div class="row">
-				<b>Balance Date Added</b>
-				<div class="max right-align">{ acc.BalanceAddedDate.Format("1/2/06") }</div>
-			</div>
-			<div class="row">
-				<button class="transparent"><i>edit</i></button>
-				<button class="transparent"><i>group</i></button>
-			</div>
-		</article>
-		<div class="large-space"></div>
-		{{ txnListTarget := fmt.Sprintf("/accounts/%d/transactions/0", acc.ID) }}
-		<div hx-get={ txnListTarget } hx-trigger="load" hx-swap="outerHTML"></div>
+		<div class="grid">
+			<article class="s6 large-padding">
+				<div class="row">
+					<h6 class="medium-width truncate">{ acc.AccountName }</h6>
+					<h6 class="max right-align">
+						@AmountColorized(acc.Balance)
+					</h6>
+				</div>
+				<hr class="large"/>
+				<div class="row">
+					<b>Organization</b>
+					<div class="max right-align">{ acc.InstName }</div>
+				</div>
+				<div class="row">
+					<b>Account Class</b>
+					<div class="max right-align">{ ternary.String(acc.AccountClass, "No Class Assigned") }</div>
+				</div>
+				<div class="row">
+					<b>Account Type</b>
+					<div class="max right-align">{ ternary.String(acc.AccountType, "No Type Assigned") }</div>
+				</div>
+				<div class="row">
+					<b>Currency</b>
+					<div class="max right-align">{ acc.Currency }</div>
+				</div>
+				<div class="row">
+					<b>Balance Date</b>
+					<div class="max right-align">{ acc.BalanceDate.Format("1/2/06") }</div>
+				</div>
+				<div class="row">
+					<b>Balance Date Added</b>
+					<div class="max right-align">{ acc.BalanceAddedDate.Format("1/2/06") }</div>
+				</div>
+				<div class="row">
+					<button class="transparent"><i>edit</i></button>
+					<button class="transparent"><i>group</i></button>
+				</div>
+			</article>
+		</div>
+		<table class="border">
+			<thead class="fixed">
+				<tr>
+					<th>Date</th>
+					<th>Description</th>
+					<th>Category</th>
+					<th>Amount</th>
+					<th>Account</th>
+				</tr>
+			</thead>
+			<tbody id="txn-list">
+				{{ txnListTarget := fmt.Sprintf("/accounts/%d/transactions/0", acc.ID) }}
+				<div hx-get={ txnListTarget } hx-trigger="load" hx-swap="innerHTML" hx-target="#txn-list"></div>
+			</tbody>
+		</table>
 	</main>
 }

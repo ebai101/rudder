@@ -5,93 +5,80 @@ import (
 	"github.com/shopspring/decimal"
 	"rudder/internal/models"
 	"rudder/util/ternary"
-	"sort"
-	"time"
 )
 
-templ AmountColorized(classes string, amt decimal.Decimal) {
+const PAGE_SIZE int64 = 100
+
+templ AmountColorized(amt decimal.Decimal) {
 	{{
-	amtClasses := classes
+	var amtClasses string
 	if amt.GreaterThan(decimal.NewFromInt(1)) {
-		amtClasses = classes + " green-text"
+		amtClasses = "green-text"
 	} else if amt.LessThanOrEqual(decimal.NewFromInt(-100)) {
-		amtClasses = classes + " red-text"
+		amtClasses = "red-text"
 	}
 	}}
-	<h6 class={ amtClasses }>${ amt.StringFixed(2) }</h6>
+	<span class={ amtClasses }>${ amt.StringFixed(2) }</span>
 }
 
 templ Transactions(txns []models.Transaction) {
 	{{ appBarParams := AppBarParams{Title: "Transactions", BackVisible: false, MoreVisible: false} }}
 	@AppBar(appBarParams)
 	<main class="responsive">
-		@TransactionsList(txns, "/transactions/", 20)
+		<div class="small-height"></div>
+		<div class="large-height scroll surface">
+			<table class="border">
+				<thead class="fixed">
+					<tr>
+						<th>Date</th>
+						<th>Description</th>
+						<th>Category</th>
+						<th>Amount</th>
+						<th>Account</th>
+					</tr>
+				</thead>
+				<tbody>
+					@TransactionsList(txns, "/transactions/", PAGE_SIZE)
+				</tbody>
+			</table>
+		</div>
 	</main>
 }
 
 templ TransactionsList(txns []models.Transaction, baseEndpoint string, nextPage int64) {
 	{{
-	hasNextPage := len(txns) == 21
+	hasNextPage := len(txns) == int(PAGE_SIZE)+1
 	if hasNextPage {
-		txns = txns[0:20]
+		txns = txns[0:PAGE_SIZE]
 	}
-	txnsByDate := make(map[string][]models.Transaction)
-	for _, txn := range txns {
-		dateKey := txn.PostedDate.Format("1/2/06")
-		txnsByDate[dateKey] = append(txnsByDate[dateKey], txn)
-	}
-
-	var uniqueDates []time.Time
-	for dateStr := range txnsByDate {
-		date, _ := time.Parse("1/2/06", dateStr)
-		uniqueDates = append(uniqueDates, date)
-	}
-
-	sort.SliceStable(uniqueDates, func(i, j int) bool {
-		return uniqueDates[i].After(uniqueDates[j])
-	})
 	}}
-	for _, date := range uniqueDates {
-		<div>
-			{{ dateKey := date.Format("1/2/06") }}
-			<h6>{ dateKey }</h6>
-			<hr class="small"/>
-		</div>
-		<div class="large-margin">
-			for _, txn := range txnsByDate[dateKey] {
-				{{ detailEndpoint := fmt.Sprintf("/transactions/detail/%d", txn.ID) }}
-				<article
-					hx-get={ detailEndpoint }
-					hx-target="main"
-					hx-replace-url="true"
-					hx-swap="outerHTML"
-					class="wave"
-				>
-					<summary class="none">
-						<nav class="row">
-							<div class="max">
-								<h6 class="small">{ txn.Description }</h6>
-								<div>{ ternary.String(txn.Category, "Uncategorized") }</div>
-							</div>
-							@AmountColorized("medium", txn.Amount)
-						</nav>
-					</summary>
-				</article>
-			}
-		</div>
+	for _, txn := range txns {
+		{{ detailEndpoint := fmt.Sprintf("/transactions/detail/%d", txn.ID) }}
+		<tr
+			class="wave"
+			hx-get={ detailEndpoint }
+			hx-target="main"
+			hx-replace-url="true"
+			hx-swap="outerHTML"
+		>
+			<td>{ txn.PostedDate.Format("1/2/06") }</td>
+			<td>{ txn.Description }</td>
+			<td>{ txn.Category }</td>
+			<td>
+				@AmountColorized(txn.Amount)
+			</td>
+			<td>{ txn.AccountName }</td>
+		</tr>
 	}
 	if hasNextPage {
 		{{ nextPageEndpoint := fmt.Sprintf("%s%d", baseEndpoint, nextPage) }}
-		<footer
-			class="transparent"
+		<tr
 			hx-get={ nextPageEndpoint }
-			hx-trigger="revealed"
+			hx-trigger="intersect once"
 			hx-swap="outerHTML"
-		>
-			<progress class="circle large center"></progress>
-		</footer>
+		><td>Loading...</td></tr>
 	} else {
-		<footer class="center-align transparent">No more transactions to display</footer>
+		<tr>No more transactions to display</tr>
 	}
 }
 
@@ -105,7 +92,9 @@ templ TransactionDetail(txn models.Transaction) {
 		<article class="large-padding">
 			<div class="row">
 				<h6>{ txn.Description }</h6>
-				@AmountColorized("max right-align", txn.Amount)
+				<h6 class="max right-align">
+					@AmountColorized(txn.Amount)
+				</h6>
 			</div>
 			<hr class="large"/>
 			<div class="row">
@@ -151,7 +140,9 @@ templ TransactionDetail(txn models.Transaction) {
 templ TransactionDetailEdit(txn models.Transaction) {
 	<div class="row">
 		<h6>{ txn.Description }</h6>
-		@AmountColorized("max right-align", txn.Amount)
+		<h6 class="max right-align">
+			@AmountColorized(txn.Amount)
+		</h6>
 	</div>
 	<hr class="large"/>
 	<div class="field label small border">

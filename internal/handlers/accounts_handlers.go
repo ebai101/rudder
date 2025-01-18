@@ -74,7 +74,7 @@ func (ah *AccountsHandlers) accsTransactionsHandler(c echo.Context) error {
 		return nil
 	}
 
-	txns, err := ah.service.GetAccountTransactions(ctx, 21, 0, id)
+	txns, err := ah.service.GetAccountTransactions(ctx, int32(PAGE_SIZE)+1, 0, id)
 	if err != nil {
 		return err
 	}
@@ -97,9 +97,9 @@ func (ah *AccountsHandlers) accsTransactionsScrollHandler(c echo.Context) error 
 	if err != nil {
 		page = 0
 	}
-	nextPage := page + pageSize
+	nextPage := page + PAGE_SIZE
 
-	txns, err := ah.service.GetAccountTransactions(ctx, 21, int32(page), id)
+	txns, err := ah.service.GetAccountTransactions(ctx, int32(PAGE_SIZE)+1, int32(page), id)
 	if err != nil {
 		return err
 	}
