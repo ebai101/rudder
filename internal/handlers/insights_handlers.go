@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"log"
 	"rudder/internal/models"
 	"rudder/internal/services"
 	"rudder/internal/views"
@@ -39,6 +40,7 @@ func (ih *InsightsHandlers) insightsHandler(c echo.Context) error {
 }
 
 func (ih *InsightsHandlers) insightsPeriodHandler(c echo.Context) error {
+	log.Println("insights handler called")
 	c.Set("ISERROR", false)
 	ctx := c.Request().Context()
 
@@ -55,5 +57,6 @@ func (ih *InsightsHandlers) insightsPeriodHandler(c echo.Context) error {
 	}
 
 	component := views.IndexInsights(ins, chartData)
+	log.Println("insights handler done")
 	return renderView(c, component)
 }

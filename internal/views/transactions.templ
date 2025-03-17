@@ -25,8 +25,7 @@ templ Transactions(txns []models.Transaction) {
 	{{ appBarParams := AppBarParams{Title: "Transactions", BackVisible: false, MoreVisible: false} }}
 	@AppBar(appBarParams)
 	<main class="responsive">
-		<div class="small-height"></div>
-		<div class="large-height scroll surface">
+		<div class="large-height scroll surface" style="block-size: 48rem !important;">
 			<table class="border">
 				<thead class="fixed">
 					<tr>
@@ -35,6 +34,7 @@ templ Transactions(txns []models.Transaction) {
 						<th>Category</th>
 						<th>Amount</th>
 						<th>Account</th>
+						<th class="center-align"><i>info</i></th>
 					</tr>
 				</thead>
 				<tbody>
@@ -53,14 +53,10 @@ templ TransactionsList(txns []models.Transaction, baseEndpoint string, nextPage 
 	}
 	}}
 	for _, txn := range txns {
-		{{ detailEndpoint := fmt.Sprintf("/transactions/detail/%d", txn.ID) }}
-		<tr
-			class="wave"
-			hx-get={ detailEndpoint }
-			hx-target="main"
-			hx-replace-url="true"
-			hx-swap="outerHTML"
-		>
+		{{
+			detailEndpoint := fmt.Sprintf("/transactions/detail/%d", txn.ID)
+		}}
+		<tr>
 			<td>{ txn.PostedDate.Format("1/2/06") }</td>
 			<td>{ txn.Description }</td>
 			<td>{ txn.Category }</td>
@@ -68,6 +64,15 @@ templ TransactionsList(txns []models.Transaction, baseEndpoint string, nextPage 
 				@AmountColorized(txn.Amount)
 			</td>
 			<td>{ txn.AccountName }</td>
+			<td>
+				<button
+					class="responsive small fill"
+					hx-get={ detailEndpoint }
+					hx-target="main"
+					hx-replace-url="true"
+					hx-swap="outerHTML"
+				><i>info</i></button>
+			</td>
 		</tr>
 	}
 	if hasNextPage {

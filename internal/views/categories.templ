@@ -9,19 +9,21 @@ templ Autocat(rules []models.AutocatRule) {
 	{{ params := AppBarParams{Title: "Categories", BackVisible: false, MoreVisible: false} }}
 	@AppBar(params)
 	<main class="responsive">
-		<table>
-			<thead>
-				<tr>
-					<th>Criteria</th>
-					<th>Overrides</th>
-				</tr>
-			</thead>
-			<tbody>
-				for _, rule := range rules {
-					@AutocatRuleRow(rule)
-				}
-			</tbody>
-		</table>
+		<div class="large-height scroll surface" style="block-size: 48rem !important;">
+			<table class="border">
+				<thead class="fixed">
+					<tr>
+						<th>Criteria</th>
+						<th>Overrides</th>
+					</tr>
+				</thead>
+				<tbody>
+					for _, rule := range rules {
+						@AutocatRuleRow(rule)
+					}
+				</tbody>
+			</table>
+		</div>
 	</main>
 }
 
