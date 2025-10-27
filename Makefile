@@ -20,4 +20,4 @@ live:
 	make -j4 live/templ live/server live/sync_assets live/sync_sqlc
 
 sync:
-	go run cmd/server/main.go -update $(ARGS)
+	go run cmd/server/main.go -update -days 60
